@@ -3,14 +3,14 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>MCU POV: Wakanda's Front Line</title>
+  <title>MCU POV: Wakanda - Pre-Rendered Media Cutout Style</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Cabinet+Grotesk:wght@800;900&family=Plus+Jakarta+Sans:wght@700;800;900&display=swap');
 
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
-      background: #030508;
+      background: #020306;
       display: grid;
       place-items: center;
       min-height: 100vh;
@@ -22,43 +22,44 @@
       position: relative;
       width: 1080px;
       height: 1920px;
-      background: radial-gradient(circle at 50% 30%, #151a28 0%, #060911 70%, #020306 100%);
+      background: radial-gradient(circle at 50% 35%, #182030 0%, #090e18 60%, #020408 100%);
       overflow: hidden;
-      box-shadow: 0 0 120px rgba(0, 0, 0, 0.95);
+      box-shadow: 0 0 140px rgba(0, 0, 0, 0.95);
     }
 
-    /* Ambient Film Grain & Vignette */
-    .film-grain {
+    /* Subtle Cinematic Overlay Grid & Vignette */
+    .bg-grid {
       position: absolute;
       inset: 0;
-      opacity: 0.12;
-      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
-      pointer-events: none;
-      z-index: 90;
+      background-image: 
+        radial-gradient(rgba(255, 255, 255, 0.06) 1.5px, transparent 1.5px),
+        linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+      background-size: 40px 40px, 80px 80px, 80px 80px;
     }
-    .cinematic-vignette {
+    .vignette {
       position: absolute;
       inset: 0;
-      background: radial-gradient(circle at 50% 50%, transparent 40%, rgba(2, 4, 8, 0.85) 100%);
+      background: radial-gradient(circle at 50% 50%, transparent 35%, rgba(0, 0, 0, 0.85) 100%);
       pointer-events: none;
-      z-index: 80;
+      z-index: 60;
     }
 
-    /* Top HUD Badge */
-    .hud-pill {
+    /* Top HUD Status Pill (Timswissen Style) */
+    .hud-header {
       position: absolute;
-      top: 140px;
+      top: 130px;
       left: 50%;
       transform: translateX(-50%);
-      background: rgba(14, 20, 32, 0.75);
-      border: 1.5px solid rgba(255, 255, 255, 0.14);
+      background: rgba(15, 23, 42, 0.8);
+      border: 1.5px solid rgba(255, 255, 255, 0.16);
       backdrop-filter: blur(24px) saturate(180%);
-      padding: 18px 44px;
+      padding: 18px 46px;
       border-radius: 999px;
       display: flex;
       align-items: center;
       gap: 16px;
-      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.25);
+      box-shadow: 0 20px 45px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.25);
       z-index: 70;
     }
     .hud-dot {
@@ -68,7 +69,7 @@
       background: #ef4444;
       box-shadow: 0 0 18px #ef4444;
     }
-    .hud-pill span {
+    .hud-header span {
       font-size: 26px;
       font-weight: 800;
       letter-spacing: 4px;
@@ -76,63 +77,92 @@
       color: #f8fafc;
     }
 
-    /* Main Realistic 3D Stage Glass Card */
-    .canvas-card {
+    /* Central 3D Floating Neumorphic Display Card */
+    .stage-card {
       position: absolute;
-      top: 310px;
-      left: 80px;
-      right: 80px;
-      height: 1040px;
-      border-radius: 48px;
-      background: linear-gradient(175deg, rgba(22, 30, 48, 0.75) 0%, rgba(8, 12, 22, 0.92) 100%);
-      border: 1.5px solid rgba(255, 255, 255, 0.12);
+      top: 300px;
+      left: 70px;
+      right: 70px;
+      height: 1080px;
+      border-radius: 52px;
+      background: linear-gradient(165deg, rgba(28, 38, 62, 0.8) 0%, rgba(10, 16, 28, 0.95) 100%);
+      border: 1.5px solid rgba(255, 255, 255, 0.14);
       box-shadow: 
-        0 40px 100px rgba(0, 0, 0, 0.8),
-        inset 0 1px 2px rgba(255, 255, 255, 0.2),
-        inset 0 -1px 2px rgba(0, 0, 0, 0.5);
+        0 40px 100px rgba(0, 0, 0, 0.85),
+        inset 0 1px 2px rgba(255, 255, 255, 0.25),
+        inset 0 -2px 4px rgba(0, 0, 0, 0.6);
       overflow: hidden;
       z-index: 20;
     }
 
-    .scene-layer {
+    .scene-viewport {
       position: absolute;
       inset: 0;
       opacity: 0;
       display: flex;
       justify-content: center;
       align-items: center;
+      overflow: hidden;
     }
 
-    /* Tactical Depth Grid & Radar */
-    .radar-grid {
+    /* Real Cinematic Media Layer (Cutout / Video / Image) */
+    .media-layer {
       position: absolute;
       inset: 0;
-      background-image: 
-        radial-gradient(circle at 50% 50%, rgba(56, 189, 248, 0.08) 0%, transparent 65%),
-        linear-gradient(rgba(255, 255, 255, 0.04) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
-      background-size: 100% 100%, 50px 50px, 50px 50px;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 52px;
+      filter: contrast(1.1) brightness(0.95);
+      transform-origin: center center;
     }
 
-    /* High-Impact Word-by-Word Subtitle Bar */
-    .caption-wrapper {
-      position: absolute;
-      bottom: 210px;
-      left: 70px;
-      right: 70px;
+    /* 3D Floating Cutout Image Frame */
+    .cutout-wrapper {
+      position: relative;
+      width: 100%;
+      height: 100%;
       display: flex;
       justify-content: center;
       align-items: center;
-      z-index: 70;
+    }
+    .cutout-img {
+      width: 90%;
+      height: 82%;
+      object-fit: cover;
+      border-radius: 36px;
+      border: 2px solid rgba(255, 255, 255, 0.18);
+      box-shadow: 0 25px 60px rgba(0,0,0,0.85);
+      transform: scale(0.95);
+    }
+
+    /* Laser / Lighting Compositing Effects */
+    .fx-overlay {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      z-index: 30;
+    }
+
+    /* Kinetic Subtitles (Timswissen / TikTok Style) */
+    .caption-container {
+      position: absolute;
+      bottom: 200px;
+      left: 60px;
+      right: 60px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 80;
       min-height: 180px;
     }
     .caption-pill {
-      background: rgba(10, 15, 26, 0.88);
-      border: 1.5px solid rgba(255, 255, 255, 0.16);
+      background: rgba(10, 15, 28, 0.92);
+      border: 1.5px solid rgba(255, 255, 255, 0.18);
       backdrop-filter: blur(28px);
-      padding: 30px 48px;
-      border-radius: 40px;
-      box-shadow: 0 25px 70px rgba(0, 0, 0, 0.85);
+      padding: 30px 52px;
+      border-radius: 42px;
+      box-shadow: 0 25px 70px rgba(0, 0, 0, 0.9);
       text-align: center;
     }
     .cap-word {
@@ -146,7 +176,7 @@
       color: #ffffff;
       margin: 0 10px;
       opacity: 0;
-      transform: translateY(24px) scale(0.8);
+      transform: translateY(24px) scale(0.75);
       filter: blur(8px);
     }
     .cap-word.highlight-neon {
@@ -166,8 +196,7 @@
       text-shadow: 0 0 35px rgba(239, 68, 68, 0.8), 0 0 10px rgba(239, 68, 68, 0.5);
     }
 
-    /* Screen Effects */
-    #impactFlash {
+    #flash {
       position: absolute;
       inset: 0;
       background: #ffffff;
@@ -180,189 +209,123 @@
 <body>
 
 <div id="viewport">
-  <div class="radar-grid"></div>
+  <div class="bg-grid"></div>
 
   <!-- Top Status Pill -->
-  <div class="hud-pill">
+  <div class="hud-header">
     <div class="hud-dot" id="hudDot"></div>
     <span id="hudLabel">MCU POV • WAKANDA BORDER</span>
   </div>
 
-  <!-- Central Neumorphic Visual Card -->
-  <div class="canvas-card" id="cardBox">
+  <!-- Central Neumorphic Card with Embedded Real Media -->
+  <div class="stage-card" id="stageCard">
     
-    <!-- Scene 1: Realistic Barrier Fracture & Charging Swarm -->
-    <div class="scene-layer" id="scene1">
-      <svg width="920" height="1040" viewBox="0 0 920 1040">
-        <defs>
-          <filter id="softGlow" x="-20%" y="-20%" width="140%" height="140%">
-            <feGaussianBlur stdDeviation="12" result="blur"/>
-            <feMerge>
-              <feMergeNode in="blur"/>
-              <feMergeNode in="SourceGraphic"/>
-            </feMerge>
-          </filter>
-          <radialGradient id="barrierPulse" cx="50%" cy="50%" r="50%">
-            <stop offset="0%" stop-color="#38bdf8" stop-opacity="0.35"/>
-            <stop offset="70%" stop-color="#0284c7" stop-opacity="0.12"/>
-            <stop offset="100%" stop-color="#0284c7" stop-opacity="0"/>
-          </radialGradient>
-        </defs>
-
-        <!-- Defensive Wakandan Perimeter Ring -->
-        <circle cx="460" cy="520" r="380" fill="url(#barrierPulse)" stroke="rgba(56, 189, 248, 0.25)" stroke-width="2"/>
-        <circle cx="460" cy="520" r="280" fill="none" stroke="rgba(255, 255, 255, 0.08)" stroke-width="1.5" stroke-dasharray="10 10"/>
-
-        <!-- Intricate Hexagonal Energy Shield -->
-        <g id="shieldMesh" filter="url(#softGlow)" stroke="#38bdf8" stroke-width="3" fill="rgba(14, 165, 233, 0.08)">
-          <polygon points="460,240 540,285 540,375 460,420 380,375 380,285"/>
-          <polygon points="545,288 625,333 625,423 545,468 465,423 465,333"/>
-          <polygon points="375,288 455,333 455,423 375,468 295,423 295,333"/>
-          <polygon points="460,425 540,470 540,560 460,605 380,560 380,470"/>
-        </g>
-
-        <!-- Dynamic Enemy Outrider Clusters -->
-        <g id="enemySwarm"></g>
-
-        <!-- Frontline Defenders -->
-        <g id="wakandaTroops">
-          <circle cx="460" cy="740" r="22" fill="#22c55e" filter="url(#softGlow)"/>
-          <circle cx="390" cy="770" r="16" fill="#0ea5e9"/>
-          <circle cx="530" cy="770" r="16" fill="#0ea5e9"/>
-          <circle cx="320" cy="800" r="12" fill="#64748b"/>
-          <circle cx="600" cy="800" r="12" fill="#64748b"/>
-        </g>
-      </svg>
+    <!-- Scene 1: Real Wakanda Army Stand (Pre-rendered asset / video) -->
+    <div class="scene-viewport" id="scene1">
+      <div class="cutout-wrapper">
+        <img class="cutout-img" id="imgScene1" src="https://images.unsplash.com/photo-1578632767115-351597cf2477?w=1200&auto=format&fit=crop&q=80" alt="Wakanda Front Lines">
+      </div>
     </div>
 
-    <!-- Scene 2: Cinematic Bifrost Pillar -->
-    <div class="scene-layer" id="scene2">
-      <svg width="920" height="1040" viewBox="0 0 920 1040">
-        <defs>
-          <linearGradient id="bifrostBeamGrad" x1="0" y1="0" x2="1" y2="0">
-            <stop offset="0%" stop-color="#ec4899" stop-opacity="0.8"/>
-            <stop offset="25%" stop-color="#8b5cf6" stop-opacity="0.9"/>
-            <stop offset="50%" stop-color="#38bdf8" stop-opacity="1"/>
-            <stop offset="75%" stop-color="#06b6d4" stop-opacity="0.9"/>
-            <stop offset="100%" stop-color="#10b981" stop-opacity="0.8"/>
-          </linearGradient>
-          <filter id="intenseBeamBlur">
-            <feGaussianBlur stdDeviation="30" result="outerGlow"/>
-            <feGaussianBlur stdDeviation="10" result="innerGlow"/>
-            <feMerge>
-              <feMergeNode in="outerGlow"/>
-              <feMergeNode in="innerGlow"/>
-              <feMergeNode in="SourceGraphic"/>
-            </feMerge>
-          </filter>
-        </defs>
-
-        <!-- Vertical Laser Beam Core -->
-        <rect id="beamCore" x="370" y="0" width="180" height="880" fill="url(#bifrostBeamGrad)" filter="url(#intenseBeamBlur)" opacity="0"/>
-        
-        <!-- Concentric Impact Shockwaves -->
-        <ellipse id="impactRings1" cx="460" cy="880" rx="340" ry="60" fill="none" stroke="#38bdf8" stroke-width="8" opacity="0"/>
-        <ellipse id="impactRings2" cx="460" cy="880" rx="220" ry="40" fill="rgba(56, 189, 248, 0.25)" opacity="0"/>
-      </svg>
+    <!-- Scene 2: Bifrost Atmospheric Tear -->
+    <div class="scene-viewport" id="scene2">
+      <div class="cutout-wrapper">
+        <img class="cutout-img" id="imgScene2" src="https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=1200&auto=format&fit=crop&q=80" alt="Bifrost Atmospheric Tear">
+        <svg class="fx-overlay" viewBox="0 0 940 1080">
+          <defs>
+            <linearGradient id="bifrostGrad" x1="0" y1="0" x2="1" y2="0">
+              <stop offset="0%" stop-color="#ec4899" stop-opacity="0.9"/>
+              <stop offset="30%" stop-color="#8b5cf6" stop-opacity="0.95"/>
+              <stop offset="60%" stop-color="#38bdf8" stop-opacity="1"/>
+              <stop offset="100%" stop-color="#22c55e" stop-opacity="0.9"/>
+            </linearGradient>
+            <filter id="laserGlow">
+              <feGaussianBlur stdDeviation="25" result="glow"/>
+              <feMerge>
+                <feMergeNode in="glow"/>
+                <feMergeNode in="SourceGraphic"/>
+              </feMerge>
+            </filter>
+          </defs>
+          <rect id="bifrostLaser" x="380" y="0" width="180" height="1080" fill="url(#bifrostGrad)" filter="url(#laserGlow)" opacity="0"/>
+        </svg>
+      </div>
     </div>
 
-    <!-- Scene 3: Thor Lightning Arc Overdrive -->
-    <div class="scene-layer" id="scene3">
-      <svg width="920" height="1040" viewBox="0 0 920 1040">
-        <defs>
-          <filter id="boltGlow">
-            <feGaussianBlur stdDeviation="14" result="glow"/>
-            <feMerge>
-              <feMergeNode in="glow"/>
-              <feMergeNode in="SourceGraphic"/>
-            </feMerge>
-          </filter>
-        </defs>
-
-        <!-- Lightning Arcs -->
-        <g id="lightningCanvas" stroke="#e0f2fe" stroke-width="7" stroke-linecap="round" stroke-linejoin="round" fill="none" filter="url(#boltGlow)" opacity="0">
-          <path d="M460,420 L320,240 L220,310 L90,180"/>
-          <path d="M460,420 L600,240 L700,320 L830,190"/>
-          <path d="M460,420 L340,640 L190,690 L80,860"/>
-          <path d="M460,420 L580,640 L730,690 L840,860"/>
-          <path d="M460,420 L460,110 L500,60"/>
-          <path d="M460,420 L460,820 L420,940"/>
-        </g>
-
-        <!-- Stormbreaker Radial Pulse -->
-        <circle id="thorCenter" cx="460" cy="420" r="50" fill="#ffffff" filter="url(#boltGlow)"/>
-      </svg>
+    <!-- Scene 3: Thor Lightning Obliteration -->
+    <div class="scene-viewport" id="scene3">
+      <div class="cutout-wrapper">
+        <img class="cutout-img" id="imgScene3" src="https://images.unsplash.com/photo-1509198397868-475647b2a1e5?w=1200&auto=format&fit=crop&q=80" alt="Thor Lightning">
+        <svg class="fx-overlay" viewBox="0 0 940 1080">
+          <defs>
+            <filter id="lightningFx">
+              <feGaussianBlur stdDeviation="15" result="glow"/>
+              <feMerge>
+                <feMergeNode in="glow"/>
+                <feMergeNode in="SourceGraphic"/>
+              </feMerge>
+            </filter>
+          </defs>
+          <g id="electricBolts" stroke="#e0f2fe" stroke-width="8" stroke-linecap="round" fill="none" filter="url(#lightningFx)" opacity="0">
+            <path d="M470,300 L320,180 L200,260 L80,120"/>
+            <path d="M470,300 L620,180 L740,280 L880,140"/>
+            <path d="M470,300 L340,650 L180,720 L80,920"/>
+            <path d="M470,300 L600,650 L760,720 L860,920"/>
+          </g>
+        </svg>
+      </div>
     </div>
 
-    <!-- Scene 4: The Snap & Disintegration Dust Particles -->
-    <div class="scene-layer" id="scene4">
-      <svg width="920" height="1040" viewBox="0 0 920 1040">
-        <!-- Golden Shockwave Ring -->
-        <circle id="snapShockwave" cx="460" cy="460" r="20" fill="none" stroke="#fbbf24" stroke-width="8" opacity="0"/>
-        
-        <!-- Emitted Ash & Ember Particles -->
-        <g id="ashField"></g>
-      </svg>
+    <!-- Scene 4: The Snap & Disintegration Dust -->
+    <div class="scene-viewport" id="scene4">
+      <div class="cutout-wrapper">
+        <img class="cutout-img" id="imgScene4" src="https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=1200&auto=format&fit=crop&q=80" alt="The Snap Disintegration" style="filter: grayscale(0.8) contrast(1.2);">
+        <svg class="fx-overlay" viewBox="0 0 940 1080">
+          <g id="ashField"></g>
+        </svg>
+      </div>
     </div>
 
   </div>
 
-  <!-- Dynamic TikTok Word-by-Word Subtitles -->
-  <div class="caption-wrapper">
-    <div class="caption-pill" id="subtitleBox">
-      <!-- Words injected by GSAP -->
-    </div>
+  <!-- Subtitle Container -->
+  <div class="caption-container">
+    <div class="caption-pill" id="subtitleBox"></div>
   </div>
 
-  <div id="impactFlash"></div>
-  <div class="film-grain"></div>
-  <div class="cinematic-vignette"></div>
+  <div id="flash"></div>
+  <div class="vignette"></div>
 </div>
 
 <script>
-  // Generate 60 Organic Outrider Markers
-  const swarmGroup = document.getElementById("enemySwarm");
-  for (let i = 0; i < 60; i++) {
-    const angle = Math.random() * Math.PI + Math.PI; // Top hemisphere
-    const radius = 180 + Math.random() * 200;
-    const dot = document.createElementNS("http://www.w3.org/2000/svg", "circle");
-    dot.setAttribute("cx", 460 + Math.cos(angle) * radius);
-    dot.setAttribute("cy", 420 + Math.sin(angle) * (radius * 0.7));
-    dot.setAttribute("r", Math.random() * 5 + 3);
-    dot.setAttribute("fill", "#ef4444");
-    dot.setAttribute("class", "enemy-dot");
-    dot.setAttribute("opacity", "0");
-    swarmGroup.appendChild(dot);
-  }
-
-  // Generate 120 Disintegration Ash Particles
+  // Generate 120 Disintegration Ash Particles for Scene 4
   const ashGroup = document.getElementById("ashField");
   for (let i = 0; i < 120; i++) {
     const c = document.createElementNS("http://www.w3.org/2000/svg", "circle");
-    c.setAttribute("cx", 360 + Math.random() * 200);
-    c.setAttribute("cy", 440 + Math.random() * 180);
-    c.setAttribute("r", Math.random() * 4 + 1.5);
-    c.setAttribute("fill", Math.random() > 0.4 ? "#f59e0b" : "#94a3b8");
-    c.setAttribute("class", "ash-p");
+    c.setAttribute("cx", 280 + Math.random() * 380);
+    c.setAttribute("cy", 380 + Math.random() * 320);
+    c.setAttribute("r", Math.random() * 5 + 2);
+    c.setAttribute("fill", Math.random() > 0.4 ? "#f59e0b" : "#e2e8f0");
+    c.setAttribute("class", "ash-particle");
     c.setAttribute("opacity", "0");
     ashGroup.appendChild(c);
   }
 
-  // High-Energy Kinetic Subtitle Function
-  function playSubtitle(words, highlightConfig = {}) {
+  // Word-by-Word Kinetic Subtitle Helper
+  function playSubtitle(words, highlightMap = {}) {
     const container = document.getElementById("subtitleBox");
     container.innerHTML = "";
-    const wordElements = [];
+    const els = [];
 
-    words.forEach((w, idx) => {
+    words.forEach((w, i) => {
       const span = document.createElement("span");
-      span.className = "cap-word " + (highlightConfig[idx] || "");
+      span.className = "cap-word " + (highlightMap[i] || "");
       span.textContent = w;
       container.appendChild(span);
-      wordElements.push(span);
+      els.push(span);
     });
 
-    return gsap.to(wordElements, {
+    return gsap.to(els, {
       opacity: 1,
       y: 0,
       scale: 1,
@@ -373,36 +336,27 @@
     });
   }
 
-  // Master GSAP Animation Timeline
+  // Master GSAP Timeline
   const master = gsap.timeline({ repeat: -1 });
 
-  // SCENE 1: Shield Breach & Swarm Influx (0:00 - 0:07)
+  // SCENE 1: The Shattered Barrier (0:00 - 0:07)
   master.set("#scene1", { opacity: 1 })
     .call(() => playSubtitle(["THE", "DOME", "JUST", "SHATTERED."], { 1: "highlight-crimson", 3: "highlight-crimson" }))
-    .fromTo(".enemy-dot", 
-      { opacity: 0, scale: 0 }, 
-      { opacity: 1, scale: 1.4, stagger: 0.015, duration: 1.2, ease: "power2.out" })
-    .to("#shieldMesh", {
-      scale: 1.08,
-      transformOrigin: "center",
-      stroke: "#ef4444",
-      repeat: 3,
-      yoyo: true,
-      duration: 0.2
-    })
+    .fromTo("#imgScene1", 
+      { scale: 1.15, filter: "contrast(1.2) brightness(0.6)" }, 
+      { scale: 0.98, filter: "contrast(1.1) brightness(0.95)", duration: 2.2, ease: "power2.out" })
     .call(() => playSubtitle(["MILLIONS", "ARE", "CHARGING", "AT", "YOU."], { 0: "highlight-gold" }), null, "+=1.4")
     .to("#scene1", { opacity: 0, duration: 0.4 }, "+=1.6")
 
-  // SCENE 2: Bifrost Strike (0:07 - 0:14)
+  // SCENE 2: The Bifrost Tear (0:07 - 0:14)
   master.set("#scene2", { opacity: 1 })
     .set("#hudDot", { background: "#38bdf8", boxShadow: "0 0 18px #38bdf8" })
     .set("#hudLabel", { textContent: "ANOMALY • RAINBOW BEAM" })
     .call(() => playSubtitle(["YOU", "PREPARE", "FOR", "THE", "END..."]))
-    .to("#scene2", { duration: 1.2 })
+    .fromTo("#imgScene2", { scale: 1.1 }, { scale: 0.98, duration: 1.8, ease: "power2.out" })
     .call(() => playSubtitle(["UNTIL", "A", "RAINBOW", "BEAM", "STRIKES!"], { 2: "highlight-cyan", 4: "highlight-neon" }))
-    .to("#beamCore", { opacity: 1, scaleY: 1, duration: 0.15, ease: "power4.out" })
-    .to("#impactRings1", { opacity: 1, scale: 1.3, transformOrigin: "center", duration: 0.3 }, "<")
-    .to("#impactFlash", { opacity: 0.85, duration: 0.1, yoyo: true, repeat: 1 })
+    .to("#bifrostLaser", { opacity: 1, duration: 0.12, ease: "power4.out" })
+    .to("#flash", { opacity: 0.85, duration: 0.1, yoyo: true, repeat: 1 }, "<")
     .to("#scene2", { opacity: 0, duration: 0.4 }, "+=2.0")
 
   // SCENE 3: Thor Lightning Blitz (0:14 - 0:21)
@@ -410,9 +364,10 @@
     .set("#hudDot", { background: "#22c55e", boxShadow: "0 0 18px #22c55e" })
     .set("#hudLabel", { textContent: "ALLIES ARRIVED • THOR" })
     .call(() => playSubtitle(["THOR", "LANDS.", "LIGHTNING", "ERASES", "THEM."], { 0: "highlight-gold", 2: "highlight-cyan" }))
-    .to("#impactFlash", { opacity: 0.9, duration: 0.08, repeat: 3, yoyo: true })
-    .to("#lightningCanvas", { opacity: 1, duration: 0.1, repeat: 6, yoyo: true }, "<")
-    .to("#viewport", { x: "+=18", y: "-=18", duration: 0.05, repeat: 8, yoyo: true }, "<")
+    .fromTo("#imgScene3", { scale: 1.2 }, { scale: 0.98, duration: 2.0, ease: "power2.out" })
+    .to("#flash", { opacity: 0.9, duration: 0.08, repeat: 3, yoyo: true }, "<")
+    .to("#electricBolts", { opacity: 1, duration: 0.1, repeat: 6, yoyo: true }, "<")
+    .to("#stageCard", { x: "+=16", y: "-=16", duration: 0.05, repeat: 8, yoyo: true }, "<")
     .call(() => playSubtitle(["YOU", "ACTUALLY", "SURVIVED."], { 2: "highlight-neon" }), null, "+=1.8")
     .to("#scene3", { opacity: 0, duration: 0.4 }, "+=1.6")
 
@@ -421,15 +376,15 @@
     .set("#hudDot", { background: "#fbbf24", boxShadow: "0 0 18px #fbbf24" })
     .set("#hudLabel", { textContent: "CASUALTIES • THE SNAP" })
     .call(() => playSubtitle(["THEN...", "A", "SUDDEN", "SNAP", "ECHOES."], { 3: "highlight-crimson" }))
-    .to("#snapShockwave", { opacity: 1, scale: 8, transformOrigin: "center", duration: 0.6, ease: "power2.out" })
-    .to("#impactFlash", { opacity: 0.5, duration: 0.15, yoyo: true, repeat: 1 }, "<")
-    .call(() => playSubtitle(["EVERYONE", "TURNS", "TO", "DUST."], { 3: "highlight-gold" }), null, "+=1.0")
-    .to(".ash-p", {
+    .to("#flash", { opacity: 0.6, duration: 0.15, yoyo: true, repeat: 1 })
+    .to("#imgScene4", { filter: "grayscale(1) brightness(0.4)", duration: 1.5 }, "+=0.4")
+    .call(() => playSubtitle(["EVERYONE", "TURNS", "TO", "DUST."], { 3: "highlight-gold" }), null, "+=0.6")
+    .to(".ash-particle", {
       opacity: 1,
       y: -280,
-      x: () => (Math.random() - 0.5) * 180,
+      x: () => (Math.random() - 0.5) * 160,
       stagger: 0.015,
-      duration: 2.6,
+      duration: 2.4,
       ease: "power2.out"
     })
     .to("#scene4", { opacity: 0, duration: 0.6 }, "+=1.4");
