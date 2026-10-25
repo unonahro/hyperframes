@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>MCU POV: Wakanda 3D Battle Simulator (Three.js WebGL)</title>
+  <title>MCU POV: Wakanda 3D Battle Simulator - Sunset Lighting (Three.js WebGL)</title>
   <!-- Three.js 3D Engine & GSAP -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
@@ -24,7 +24,7 @@
       position: relative;
       width: 1080px;
       height: 1920px;
-      background: #020408;
+      background: #1a0814;
       overflow: hidden;
       box-shadow: 0 0 140px rgba(0, 0, 0, 1);
     }
@@ -38,11 +38,11 @@
       z-index: 10;
     }
 
-    /* Atmospheric Vignette & Film Filter */
+    /* Cinematic Golden Hour Vignette */
     .cinematic-vignette {
       position: absolute;
       inset: 0;
-      background: radial-gradient(circle at 50% 50%, transparent 40%, rgba(2, 4, 10, 0.85) 100%);
+      background: radial-gradient(circle at 50% 40%, transparent 40%, rgba(20, 6, 12, 0.85) 100%);
       pointer-events: none;
       z-index: 20;
     }
@@ -53,8 +53,8 @@
       top: 130px;
       left: 50%;
       transform: translateX(-50%);
-      background: rgba(10, 15, 25, 0.8);
-      border: 2px solid rgba(255, 255, 255, 0.2);
+      background: rgba(28, 12, 22, 0.85);
+      border: 2px solid rgba(251, 146, 60, 0.35);
       backdrop-filter: blur(20px);
       padding: 16px 44px;
       border-radius: 999px;
@@ -68,8 +68,8 @@
       width: 16px;
       height: 16px;
       border-radius: 50%;
-      background: #ef4444;
-      box-shadow: 0 0 16px #ef4444;
+      background: #f97316;
+      box-shadow: 0 0 16px #f97316;
       animation: pulse 1s infinite alternate;
     }
     .pov-badge span {
@@ -94,8 +94,8 @@
       align-items: center;
     }
     .caption-pill {
-      background: rgba(8, 12, 22, 0.9);
-      border: 2px solid rgba(255, 255, 255, 0.2);
+      background: rgba(18, 8, 16, 0.92);
+      border: 2px solid rgba(251, 146, 60, 0.3);
       backdrop-filter: blur(28px);
       padding: 30px 48px;
       border-radius: 38px;
@@ -119,12 +119,12 @@
       text-shadow: 0 0 35px rgba(34, 197, 94, 0.9), 0 0 10px rgba(34, 197, 94, 0.6);
     }
     .cap-word.highlight-gold {
-      color: #facc15;
-      text-shadow: 0 0 35px rgba(250, 204, 21, 0.9), 0 0 10px rgba(250, 204, 21, 0.6);
+      color: #fbbf24;
+      text-shadow: 0 0 35px rgba(251, 191, 36, 0.9), 0 0 10px rgba(251, 191, 36, 0.6);
     }
     .cap-word.highlight-cyan {
-      color: #00f2fe;
-      text-shadow: 0 0 35px rgba(0, 242, 254, 0.9), 0 0 10px rgba(0, 242, 254, 0.6);
+      color: #38bdf8;
+      text-shadow: 0 0 35px rgba(56, 189, 248, 0.9), 0 0 10px rgba(56, 189, 248, 0.6);
     }
     .cap-word.highlight-red {
       color: #ef4444;
@@ -134,7 +134,7 @@
     #flash {
       position: absolute;
       inset: 0;
-      background: #ffffff;
+      background: #fff;
       opacity: 0;
       pointer-events: none;
       z-index: 50;
@@ -154,7 +154,7 @@
   <!-- HUD Badge -->
   <div class="pov-badge">
     <div class="hud-dot" id="hudDot"></div>
-    <span id="hudLabel">3D POV • WAKANDA FRONTLINE</span>
+    <span id="hudLabel">3D POV • WAKANDA SUNSET</span>
   </div>
 
   <!-- TikTok Subtitles -->
@@ -168,64 +168,73 @@
 
 <script>
   // -------------------------------------------------------------
-  // 1. THREE.JS 3D WORLD SETUP
+  // 1. THREE.JS 3D WORLD SETUP (SUNSET LIGHTING & GOLDEN HOUR)
   // -------------------------------------------------------------
   const stage = document.getElementById('stage');
   const scene = new THREE.Scene();
-  scene.fog = new THREE.FogExp2(0x060c18, 0.0035);
+  
+  // Warm Golden-Hour Sunset Fog & Background
+  scene.background = new THREE.Color(0x280e1b);
+  scene.fog = new THREE.FogExp2(0x2d101e, 0.0038);
 
   const camera = new THREE.PerspectiveCamera(65, 1080 / 1920, 0.1, 1000);
   const renderer = new THREE.WebGLRenderer({ antialias: true });
   renderer.setSize(1080, 1920);
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
-  renderer.toneMappingExposure = 1.2;
+  renderer.toneMappingExposure = 1.35;
   document.getElementById('webglCanvas').appendChild(renderer.domElement);
 
-  // Lighting
-  const ambientLight = new THREE.AmbientLight(0x223344, 1.2);
+  // Sunset Warm Ambient Lighting
+  const ambientLight = new THREE.AmbientLight(0x4a2430, 1.4);
   scene.add(ambientLight);
 
-  const moonLight = new THREE.DirectionalLight(0x88bbff, 1.8);
-  moonLight.position.set(50, 120, -50);
-  scene.add(moonLight);
+  // Low Golden Sun Horizon Light
+  const sunLight = new THREE.DirectionalLight(0xff7a33, 3.2);
+  sunLight.position.set(-80, 35, -200);
+  scene.add(sunLight);
+
+  // Purple/Magenta Fill Light for Shadows
+  const skyFillLight = new THREE.DirectionalLight(0x8a2be2, 1.2);
+  skyFillLight.position.set(60, 100, 50);
+  scene.add(skyFillLight);
 
   const flashLight = new THREE.PointLight(0x00f2fe, 0, 400);
   flashLight.position.set(0, 40, -100);
   scene.add(flashLight);
 
-  // 3D Battlefield Terrain (Wakanda Field)
+  // 3D Battlefield Terrain (Wakanda Field in Sunset Tone)
   const terrainGeo = new THREE.PlaneGeometry(800, 800, 48, 48);
   terrainGeo.rotateX(-Math.PI / 2);
   const terrainMat = new THREE.MeshStandardMaterial({
-    color: 0x1a2e1f,
-    roughness: 0.9,
-    metalness: 0.1,
+    color: 0x3d231a,
+    roughness: 0.8,
+    metalness: 0.2,
     flatShading: true
   });
   const terrain = new THREE.Mesh(terrainGeo, terrainMat);
   scene.add(terrain);
 
-  // 3D Wakandan Energy Dome Barrier
+  // 3D Wakandan Energy Dome Barrier (Warm Orange/Magenta Glow)
   const domeGeo = new THREE.SphereGeometry(180, 32, 24, 0, Math.PI * 2, 0, Math.PI / 2);
   const domeMat = new THREE.MeshBasicMaterial({
-    color: 0x00d2ff,
+    color: 0xfb923c,
     wireframe: true,
     transparent: true,
-    opacity: 0.25
+    opacity: 0.28
   });
   const dome = new THREE.Mesh(domeGeo, domeMat);
   dome.position.set(0, 0, -120);
   scene.add(dome);
 
-  // 3D Charging Outrider Horde (Instanced Meshes for Performance)
+  // 3D Charging Outrider Horde
   const outriderCount = 180;
   const outriderGeo = new THREE.ConeGeometry(1.6, 5, 5);
   outriderGeo.rotateX(Math.PI / 2);
   const outriderMat = new THREE.MeshStandardMaterial({
-    color: 0x11050a,
-    emissive: 0xef4444,
-    emissiveIntensity: 0.4,
+    color: 0x1f0a12,
+    emissive: 0xe11d48,
+    emissiveIntensity: 0.45,
     roughness: 0.4
   });
   const horde = new THREE.InstancedMesh(outriderGeo, outriderMat, outriderCount);
@@ -243,10 +252,10 @@
   }
   scene.add(horde);
 
-  // 3D Bifrost Beam (Glowing Cylinder)
+  // 3D Bifrost Beam (Glowing Sunset Rainbow Cylinder)
   const beamGeo = new THREE.CylinderGeometry(8, 8, 300, 24, 1, true);
   const beamMat = new THREE.MeshBasicMaterial({
-    color: 0x00f2fe,
+    color: 0x38bdf8,
     transparent: true,
     opacity: 0,
     side: THREE.DoubleSide
@@ -255,7 +264,7 @@
   bifrostBeam.position.set(0, 150, -60);
   scene.add(bifrostBeam);
 
-  // 3D Disintegration Ash Particle Cloud
+  // 3D Disintegration Ash Particle Cloud (Golden Sunset Embers)
   const ashCount = 800;
   const ashGeo = new THREE.BufferGeometry();
   const ashPositions = new Float32Array(ashCount * 3);
@@ -266,8 +275,8 @@
   }
   ashGeo.setAttribute('position', new THREE.BufferAttribute(ashPositions, 3));
   const ashMat = new THREE.PointsMaterial({
-    color: 0xf59e0b,
-    size: 1.8,
+    color: 0xfbbf24,
+    size: 2.0,
     transparent: true,
     opacity: 0
   });
@@ -307,12 +316,11 @@
 
   // SCENE 1: First-Person Frontline Breach (0:00 - 0:07)
   master.call(() => {
-    // Camera placed right at warrior eye level (POV)
     camera.position.set(0, 4.5, 0);
     camera.lookAt(0, 4.5, -100);
     domeMat.opacity = 0.35;
-    domeMat.color.setHex(0xef4444);
-    document.getElementById("hudDot").style.background = "#ef4444";
+    domeMat.color.setHex(0xe11d48);
+    document.getElementById("hudDot").style.background = "#e11d48";
     document.getElementById("hudLabel").textContent = "1ST PERSON POV • DOME BREACH";
   })
   .call(() => showSubtitle(["THE", "DOME", "JUST", "SHATTERED."], { 1: "highlight-red", 3: "highlight-red" }))
@@ -322,9 +330,8 @@
 
   // SCENE 2: Cinematic Drone Shot (Far Away) + Bifrost Strike (0:07 - 0:14)
   .call(() => {
-    // Switch to far-away aerial cinematic perspective
     gsap.to(camera.position, { x: 45, y: 70, z: 60, duration: 1.5, ease: "power2.out" });
-    document.getElementById("hudDot").style.background = "#00f2fe";
+    document.getElementById("hudDot").style.background = "#38bdf8";
     document.getElementById("hudLabel").textContent = "WIDE PERSPECTIVE • BIFROST TEAR";
   })
   .call(() => showSubtitle(["YOU", "PREPARE", "FOR", "THE", "END..."]))
@@ -336,7 +343,6 @@
 
   // SCENE 3: First-Person Thor Lightning Blitz (0:14 - 0:21)
   .call(() => {
-    // Return to close First-Person POV as Thor lands right in front of you
     camera.position.set(0, 4.5, -40);
     camera.lookAt(0, 4.5, -120);
     document.getElementById("hudDot").style.background = "#22c55e";
@@ -347,14 +353,12 @@
   .to("#flash", { opacity: 0.9, duration: 0.06, repeat: 3, yoyo: true }, "<")
   .to("#stage", { x: "+=18", y: "-=18", duration: 0.04, repeat: 10, yoyo: true }, "<")
   .call(() => {
-    // Wipe out the Outrider army
     outriderData.forEach(d => d.dead = true);
   })
   .call(() => showSubtitle(["YOU", "ACTUALLY", "SURVIVED."], { 2: "highlight-neon" }), null, "+=1.8")
 
   // SCENE 4: Wide Pan & Snap Disintegration Dust (0:21 - 0:28)
   .call(() => {
-    // Cinematic slow camera orbit as everyone turns to ash
     gsap.to(camera.position, { x: -30, y: 35, z: 20, duration: 3.5, ease: "power2.out" });
     document.getElementById("hudDot").style.background = "#f59e0b";
     document.getElementById("hudLabel").textContent = "CINEMATIC WIDE • THE SNAP";
@@ -365,7 +369,6 @@
   .call(() => showSubtitle(["EVERYONE", "TURNS", "TO", "DUST."], { 3: "highlight-gold" }), null, "+=0.8")
   .to(ashMat, { opacity: 0, duration: 1.2 }, "+=2.0")
   .call(() => {
-    // Reset outriders for seamless loop
     outriderData.forEach(d => { d.dead = false; d.z = -140 - Math.random() * 200; });
   });
 
@@ -382,7 +385,7 @@
         data.z += data.speed;
         if (data.z > 20) data.z = -240;
       } else {
-        data.z -= 0.2; // Fallback
+        data.z -= 0.2;
       }
       dummy.position.set(data.x, 2.5, data.z);
       dummy.rotation.x = Math.sin(Date.now() * 0.01 + i) * 0.2;
