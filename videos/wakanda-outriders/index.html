@@ -3,7 +3,9 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>MCU POV: Wakanda Frontline - Live-Action Canvas</title>
+  <title>MCU POV: Wakanda 3D Battle Simulator (Three.js WebGL)</title>
+  <!-- Three.js 3D Engine & GSAP -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,900;1,900&display=swap');
@@ -22,82 +24,53 @@
       position: relative;
       width: 1080px;
       height: 1920px;
-      background: #000;
+      background: #020408;
       overflow: hidden;
-      box-shadow: 0 0 120px rgba(0, 0, 0, 1);
+      box-shadow: 0 0 140px rgba(0, 0, 0, 1);
     }
 
-    /* Cinematic Film Noise & Vignette Overlays */
-    .film-grain {
-      position: absolute;
-      inset: 0;
-      opacity: 0.16;
-      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
-      pointer-events: none;
-      z-index: 50;
-    }
-    .cinematic-vignette {
-      position: absolute;
-      inset: 0;
-      background: radial-gradient(circle at 50% 50%, transparent 45%, rgba(0, 0, 0, 0.9) 100%);
-      pointer-events: none;
-      z-index: 45;
-    }
-
-    /* Scene Video Containers */
-    .scene-clip {
+    /* 3D WebGL Canvas Layer */
+    #webglCanvas {
       position: absolute;
       inset: 0;
       width: 100%;
       height: 100%;
-      opacity: 0;
-      overflow: hidden;
-      background-size: cover;
-      background-position: center;
+      z-index: 10;
     }
 
-    /* High-Res Cinematic MCU Atmosphere Backdrops */
-    #clip1 {
-      background-image: url('https://images.unsplash.com/photo-1534447677768-be436bb09401?w=1600&auto=format&fit=crop&q=80');
-      filter: contrast(1.25) saturate(1.2) brightness(0.75);
-    }
-    #clip2 {
-      background-image: url('https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=1600&auto=format&fit=crop&q=80');
-      filter: contrast(1.3) saturate(1.4) brightness(0.85);
-    }
-    #clip3 {
-      background-image: url('https://images.unsplash.com/photo-1509198397868-475647b2a1e5?w=1600&auto=format&fit=crop&q=80');
-      filter: contrast(1.4) saturate(1.3) brightness(0.9);
-    }
-    #clip4 {
-      background-image: url('https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=1600&auto=format&fit=crop&q=80');
-      filter: grayscale(1) contrast(1.4) brightness(0.5);
+    /* Atmospheric Vignette & Film Filter */
+    .cinematic-vignette {
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at 50% 50%, transparent 40%, rgba(2, 4, 10, 0.85) 100%);
+      pointer-events: none;
+      z-index: 20;
     }
 
-    /* Top Floating TikTok POV Header */
+    /* Top HUD / POV Badge */
     .pov-badge {
       position: absolute;
-      top: 140px;
+      top: 130px;
       left: 50%;
       transform: translateX(-50%);
-      background: rgba(0, 0, 0, 0.75);
+      background: rgba(10, 15, 25, 0.8);
       border: 2px solid rgba(255, 255, 255, 0.2);
       backdrop-filter: blur(20px);
-      padding: 16px 42px;
+      padding: 16px 44px;
       border-radius: 999px;
       display: flex;
       align-items: center;
-      gap: 14px;
-      box-shadow: 0 15px 40px rgba(0, 0, 0, 0.8);
-      z-index: 60;
+      gap: 16px;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8);
+      z-index: 30;
     }
-    .live-dot {
-      width: 14px;
-      height: 14px;
+    .hud-dot {
+      width: 16px;
+      height: 16px;
       border-radius: 50%;
       background: #ef4444;
       box-shadow: 0 0 16px #ef4444;
-      animation: pulseDot 1s infinite alternate;
+      animation: pulse 1s infinite alternate;
     }
     .pov-badge span {
       font-size: 26px;
@@ -107,31 +80,31 @@
       color: #fff;
     }
 
-    /* Professional Kinetic TikTok Subtitles */
+    /* TikTok Subtitles */
     .caption-box {
       position: absolute;
-      bottom: 240px;
-      left: 50px;
-      right: 50px;
+      bottom: 220px;
+      left: 60px;
+      right: 60px;
       text-align: center;
-      z-index: 60;
-      min-height: 220px;
+      z-index: 30;
+      min-height: 200px;
       display: flex;
       justify-content: center;
       align-items: center;
     }
     .caption-pill {
-      background: rgba(0, 0, 0, 0.85);
-      border: 2px solid rgba(255, 255, 255, 0.18);
-      backdrop-filter: blur(25px);
-      padding: 32px 48px;
+      background: rgba(8, 12, 22, 0.9);
+      border: 2px solid rgba(255, 255, 255, 0.2);
+      backdrop-filter: blur(28px);
+      padding: 30px 48px;
       border-radius: 38px;
       box-shadow: 0 25px 80px rgba(0,0,0,0.95);
       display: inline-block;
     }
     .cap-word {
       display: inline-block;
-      font-size: 64px;
+      font-size: 60px;
       font-weight: 900;
       text-transform: uppercase;
       line-height: 1.15;
@@ -140,44 +113,34 @@
       margin: 0 10px;
       opacity: 0;
       transform: scale(0.6) translateY(24px);
-      text-shadow: 0 4px 18px rgba(0, 0, 0, 0.9);
     }
     .cap-word.highlight-neon {
       color: #22c55e;
-      text-shadow: 0 0 35px rgba(34, 197, 94, 0.9), 0 0 12px rgba(34, 197, 94, 0.6);
+      text-shadow: 0 0 35px rgba(34, 197, 94, 0.9), 0 0 10px rgba(34, 197, 94, 0.6);
     }
     .cap-word.highlight-gold {
       color: #facc15;
-      text-shadow: 0 0 35px rgba(250, 204, 21, 0.9), 0 0 12px rgba(250, 204, 21, 0.6);
+      text-shadow: 0 0 35px rgba(250, 204, 21, 0.9), 0 0 10px rgba(250, 204, 21, 0.6);
     }
     .cap-word.highlight-cyan {
       color: #00f2fe;
-      text-shadow: 0 0 35px rgba(0, 242, 254, 0.9), 0 0 12px rgba(0, 242, 254, 0.6);
+      text-shadow: 0 0 35px rgba(0, 242, 254, 0.9), 0 0 10px rgba(0, 242, 254, 0.6);
     }
     .cap-word.highlight-red {
       color: #ef4444;
-      text-shadow: 0 0 35px rgba(239, 68, 68, 0.9), 0 0 12px rgba(239, 68, 68, 0.6);
+      text-shadow: 0 0 35px rgba(239, 68, 68, 0.9), 0 0 10px rgba(239, 68, 68, 0.6);
     }
 
-    /* Screen Impacts */
-    #screenFlash {
+    #flash {
       position: absolute;
       inset: 0;
-      background: #fff;
+      background: #ffffff;
       opacity: 0;
       pointer-events: none;
-      z-index: 90;
+      z-index: 50;
     }
 
-    /* Ash Disintegration Particles */
-    #ashCanvas {
-      position: absolute;
-      inset: 0;
-      pointer-events: none;
-      z-index: 40;
-    }
-
-    @keyframes pulseDot {
+    @keyframes pulse {
       from { transform: scale(1); opacity: 0.8; }
       to { transform: scale(1.3); opacity: 1; }
     }
@@ -186,51 +149,134 @@
 <body>
 
 <div id="stage">
-  <!-- Scene 1: The Wakanda Frontlines & Breach -->
-  <div class="scene-clip" id="clip1"></div>
+  <div id="webglCanvas"></div>
 
-  <!-- Scene 2: The Bifrost Beam Tears Open the Sky -->
-  <div class="scene-clip" id="clip2"></div>
-
-  <!-- Scene 3: Thor Lightning Blitz -->
-  <div class="scene-clip" id="clip3"></div>
-
-  <!-- Scene 4: The Snap & Disintegration -->
-  <div class="scene-clip" id="clip4">
-    <svg id="ashCanvas" viewBox="0 0 1080 1920"></svg>
-  </div>
-
-  <!-- Top Badge -->
+  <!-- HUD Badge -->
   <div class="pov-badge">
-    <div class="live-dot" id="liveDot"></div>
-    <span id="badgeLabel">POV: WAKANDA WARRIOR</span>
+    <div class="hud-dot" id="hudDot"></div>
+    <span id="hudLabel">3D POV • WAKANDA FRONTLINE</span>
   </div>
 
-  <!-- TikTok Animated Captions -->
+  <!-- TikTok Subtitles -->
   <div class="caption-box">
     <div class="caption-pill" id="captionTarget"></div>
   </div>
 
-  <div id="screenFlash"></div>
+  <div id="flash"></div>
   <div class="cinematic-vignette"></div>
-  <div class="film-grain"></div>
 </div>
 
 <script>
-  // Setup Snap Ash Particle System
-  const ashSvg = document.getElementById("ashCanvas");
-  for (let i = 0; i < 140; i++) {
-    const p = document.createElementNS("http://www.w3.org/2000/svg", "circle");
-    p.setAttribute("cx", Math.random() * 1080);
-    p.setAttribute("cy", 800 + Math.random() * 900);
-    p.setAttribute("r", Math.random() * 7 + 2);
-    p.setAttribute("fill", Math.random() > 0.4 ? "#f59e0b" : "#cbd5e1");
-    p.setAttribute("class", "dust-part");
-    p.setAttribute("opacity", "0");
-    ashSvg.appendChild(p);
-  }
+  // -------------------------------------------------------------
+  // 1. THREE.JS 3D WORLD SETUP
+  // -------------------------------------------------------------
+  const stage = document.getElementById('stage');
+  const scene = new THREE.Scene();
+  scene.fog = new THREE.FogExp2(0x060c18, 0.0035);
 
-  // Word-by-Word Kinetic Subtitle Engine
+  const camera = new THREE.PerspectiveCamera(65, 1080 / 1920, 0.1, 1000);
+  const renderer = new THREE.WebGLRenderer({ antialias: true });
+  renderer.setSize(1080, 1920);
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  renderer.toneMapping = THREE.ACESFilmicToneMapping;
+  renderer.toneMappingExposure = 1.2;
+  document.getElementById('webglCanvas').appendChild(renderer.domElement);
+
+  // Lighting
+  const ambientLight = new THREE.AmbientLight(0x223344, 1.2);
+  scene.add(ambientLight);
+
+  const moonLight = new THREE.DirectionalLight(0x88bbff, 1.8);
+  moonLight.position.set(50, 120, -50);
+  scene.add(moonLight);
+
+  const flashLight = new THREE.PointLight(0x00f2fe, 0, 400);
+  flashLight.position.set(0, 40, -100);
+  scene.add(flashLight);
+
+  // 3D Battlefield Terrain (Wakanda Field)
+  const terrainGeo = new THREE.PlaneGeometry(800, 800, 48, 48);
+  terrainGeo.rotateX(-Math.PI / 2);
+  const terrainMat = new THREE.MeshStandardMaterial({
+    color: 0x1a2e1f,
+    roughness: 0.9,
+    metalness: 0.1,
+    flatShading: true
+  });
+  const terrain = new THREE.Mesh(terrainGeo, terrainMat);
+  scene.add(terrain);
+
+  // 3D Wakandan Energy Dome Barrier
+  const domeGeo = new THREE.SphereGeometry(180, 32, 24, 0, Math.PI * 2, 0, Math.PI / 2);
+  const domeMat = new THREE.MeshBasicMaterial({
+    color: 0x00d2ff,
+    wireframe: true,
+    transparent: true,
+    opacity: 0.25
+  });
+  const dome = new THREE.Mesh(domeGeo, domeMat);
+  dome.position.set(0, 0, -120);
+  scene.add(dome);
+
+  // 3D Charging Outrider Horde (Instanced Meshes for Performance)
+  const outriderCount = 180;
+  const outriderGeo = new THREE.ConeGeometry(1.6, 5, 5);
+  outriderGeo.rotateX(Math.PI / 2);
+  const outriderMat = new THREE.MeshStandardMaterial({
+    color: 0x11050a,
+    emissive: 0xef4444,
+    emissiveIntensity: 0.4,
+    roughness: 0.4
+  });
+  const horde = new THREE.InstancedMesh(outriderGeo, outriderMat, outriderCount);
+  const dummy = new THREE.Object3D();
+
+  const outriderData = [];
+  for (let i = 0; i < outriderCount; i++) {
+    const x = (Math.random() - 0.5) * 160;
+    const z = -140 - Math.random() * 200;
+    const speed = 0.45 + Math.random() * 0.4;
+    outriderData.push({ x, z, speed, dead: false });
+    dummy.position.set(x, 2.5, z);
+    dummy.updateMatrix();
+    horde.setMatrixAt(i, dummy.matrix);
+  }
+  scene.add(horde);
+
+  // 3D Bifrost Beam (Glowing Cylinder)
+  const beamGeo = new THREE.CylinderGeometry(8, 8, 300, 24, 1, true);
+  const beamMat = new THREE.MeshBasicMaterial({
+    color: 0x00f2fe,
+    transparent: true,
+    opacity: 0,
+    side: THREE.DoubleSide
+  });
+  const bifrostBeam = new THREE.Mesh(beamGeo, beamMat);
+  bifrostBeam.position.set(0, 150, -60);
+  scene.add(bifrostBeam);
+
+  // 3D Disintegration Ash Particle Cloud
+  const ashCount = 800;
+  const ashGeo = new THREE.BufferGeometry();
+  const ashPositions = new Float32Array(ashCount * 3);
+  for (let i = 0; i < ashCount * 3; i += 3) {
+    ashPositions[i] = (Math.random() - 0.5) * 120;
+    ashPositions[i + 1] = Math.random() * 60;
+    ashPositions[i + 2] = -20 - Math.random() * 120;
+  }
+  ashGeo.setAttribute('position', new THREE.BufferAttribute(ashPositions, 3));
+  const ashMat = new THREE.PointsMaterial({
+    color: 0xf59e0b,
+    size: 1.8,
+    transparent: true,
+    opacity: 0
+  });
+  const ashCloud = new THREE.Points(ashGeo, ashMat);
+  scene.add(ashCloud);
+
+  // -------------------------------------------------------------
+  // 2. KINETIC SUBTITLE ENGINE
+  // -------------------------------------------------------------
   function showSubtitle(words, highlights = {}) {
     const box = document.getElementById("captionTarget");
     box.innerHTML = "";
@@ -254,53 +300,109 @@
     });
   }
 
-  // Master Cinematic Timeline
-  const tl = gsap.timeline({ repeat: -1 });
+  // -------------------------------------------------------------
+  // 3. CINEMATIC 3D CAMERA TIMELINE (First-Person & Cinematic Wide)
+  // -------------------------------------------------------------
+  const master = gsap.timeline({ repeat: -1 });
 
-  // SCENE 1: The Dome Shatters (0:00 - 0:07)
-  tl.set("#clip1", { opacity: 1 })
-    .call(() => showSubtitle(["THE", "DOME", "JUST", "SHATTERED."], { 1: "highlight-red", 3: "highlight-red" }))
-    .fromTo("#clip1", { scale: 1.18 }, { scale: 1.02, duration: 2.2, ease: "power2.out" })
-    .call(() => showSubtitle(["MILLIONS", "ARE", "CHARGING", "AT", "YOU."], { 0: "highlight-gold" }), null, "+=1.2")
-    .to("#clip1", { opacity: 0, duration: 0.3 }, "+=1.8")
+  // SCENE 1: First-Person Frontline Breach (0:00 - 0:07)
+  master.call(() => {
+    // Camera placed right at warrior eye level (POV)
+    camera.position.set(0, 4.5, 0);
+    camera.lookAt(0, 4.5, -100);
+    domeMat.opacity = 0.35;
+    domeMat.color.setHex(0xef4444);
+    document.getElementById("hudDot").style.background = "#ef4444";
+    document.getElementById("hudLabel").textContent = "1ST PERSON POV • DOME BREACH";
+  })
+  .call(() => showSubtitle(["THE", "DOME", "JUST", "SHATTERED."], { 1: "highlight-red", 3: "highlight-red" }))
+  .to(camera.position, { z: -15, duration: 3, ease: "power1.inOut" })
+  .call(() => showSubtitle(["MILLIONS", "ARE", "CHARGING", "AT", "YOU."], { 0: "highlight-gold" }), null, "+=1.2")
+  .to("#stage", { x: "+=12", y: "-=12", duration: 0.05, repeat: 12, yoyo: true }, "+=0.2")
 
-  // SCENE 2: The Bifrost Strike (0:07 - 0:14)
-  tl.set("#clip2", { opacity: 1 })
-    .set("#liveDot", { background: "#00f2fe", boxShadow: "0 0 16px #00f2fe" })
-    .set("#badgeLabel", { textContent: "ANOMALY: ATMOSPHERIC TEAR" })
-    .call(() => showSubtitle(["YOU", "PREPARE", "FOR", "THE", "END..."]))
-    .fromTo("#clip2", { scale: 1.15 }, { scale: 1.0, duration: 1.8, ease: "power2.out" })
-    .call(() => showSubtitle(["UNTIL", "A", "RAINBOW", "BEAM", "STRIKES!"], { 2: "highlight-cyan", 4: "highlight-neon" }))
-    .to("#screenFlash", { opacity: 0.85, duration: 0.08, repeat: 1, yoyo: true })
-    .to("#clip2", { opacity: 0, duration: 0.3 }, "+=2.0")
+  // SCENE 2: Cinematic Drone Shot (Far Away) + Bifrost Strike (0:07 - 0:14)
+  .call(() => {
+    // Switch to far-away aerial cinematic perspective
+    gsap.to(camera.position, { x: 45, y: 70, z: 60, duration: 1.5, ease: "power2.out" });
+    document.getElementById("hudDot").style.background = "#00f2fe";
+    document.getElementById("hudLabel").textContent = "WIDE PERSPECTIVE • BIFROST TEAR";
+  })
+  .call(() => showSubtitle(["YOU", "PREPARE", "FOR", "THE", "END..."]))
+  .to(bifrostBeam.material, { opacity: 0.9, duration: 0.2, ease: "power4.out" }, "+=1.2")
+  .to(flashLight, { intensity: 8, duration: 0.1, yoyo: true, repeat: 1 }, "<")
+  .to("#flash", { opacity: 0.85, duration: 0.08, yoyo: true, repeat: 1 }, "<")
+  .call(() => showSubtitle(["UNTIL", "A", "RAINBOW", "BEAM", "STRIKES!"], { 2: "highlight-cyan", 4: "highlight-neon" }))
+  .to(bifrostBeam.material, { opacity: 0, duration: 0.6 }, "+=1.8")
 
-  // SCENE 3: Thor Lightning Wave (0:14 - 0:21)
-  tl.set("#clip3", { opacity: 1 })
-    .set("#liveDot", { background: "#22c55e", boxShadow: "0 0 16px #22c55e" })
-    .set("#badgeLabel", { textContent: "ALLIES ARRIVED: THOR" })
-    .call(() => showSubtitle(["THOR", "LANDS.", "LIGHTNING", "ERASES", "THEM."], { 0: "highlight-gold", 2: "highlight-cyan" }))
-    .fromTo("#clip3", { scale: 1.2 }, { scale: 1.0, duration: 2.0, ease: "power2.out" })
-    .to("#screenFlash", { opacity: 0.9, duration: 0.06, repeat: 3, yoyo: true }, "<")
-    .to("#stage", { x: "+=18", y: "-=18", duration: 0.04, repeat: 10, yoyo: true }, "<")
-    .call(() => showSubtitle(["YOU", "ACTUALLY", "SURVIVED."], { 2: "highlight-neon" }), null, "+=1.8")
-    .to("#clip3", { opacity: 0, duration: 0.3 }, "+=1.6")
+  // SCENE 3: First-Person Thor Lightning Blitz (0:14 - 0:21)
+  .call(() => {
+    // Return to close First-Person POV as Thor lands right in front of you
+    camera.position.set(0, 4.5, -40);
+    camera.lookAt(0, 4.5, -120);
+    document.getElementById("hudDot").style.background = "#22c55e";
+    document.getElementById("hudLabel").textContent = "1ST PERSON POV • THOR ARRIVAL";
+  })
+  .call(() => showSubtitle(["THOR", "LANDS.", "LIGHTNING", "ERASES", "THEM."], { 0: "highlight-gold", 2: "highlight-cyan" }))
+  .to(flashLight, { intensity: 12, color: 0x38bdf8, duration: 0.08, repeat: 5, yoyo: true })
+  .to("#flash", { opacity: 0.9, duration: 0.06, repeat: 3, yoyo: true }, "<")
+  .to("#stage", { x: "+=18", y: "-=18", duration: 0.04, repeat: 10, yoyo: true }, "<")
+  .call(() => {
+    // Wipe out the Outrider army
+    outriderData.forEach(d => d.dead = true);
+  })
+  .call(() => showSubtitle(["YOU", "ACTUALLY", "SURVIVED."], { 2: "highlight-neon" }), null, "+=1.8")
 
-  // SCENE 4: The Snap & Disintegration (0:21 - 0:28)
-  tl.set("#clip4", { opacity: 1 })
-    .set("#liveDot", { background: "#eab308", boxShadow: "0 0 16px #eab308" })
-    .set("#badgeLabel", { textContent: "CASUALTIES: THE SNAP" })
-    .call(() => showSubtitle(["THEN...", "A", "SUDDEN", "SNAP", "ECHOES."], { 3: "highlight-red" }))
-    .to("#screenFlash", { opacity: 0.6, duration: 0.12, yoyo: true, repeat: 1 }, "+=0.6")
-    .call(() => showSubtitle(["EVERYONE", "TURNS", "TO", "DUST."], { 3: "highlight-gold" }), null, "+=0.8")
-    .to(".dust-part", {
-      opacity: 1,
-      y: -400,
-      x: () => (Math.random() - 0.5) * 200,
-      stagger: 0.012,
-      duration: 2.6,
-      ease: "power2.out"
-    })
-    .to("#clip4", { opacity: 0, duration: 0.6 }, "+=1.4");
+  // SCENE 4: Wide Pan & Snap Disintegration Dust (0:21 - 0:28)
+  .call(() => {
+    // Cinematic slow camera orbit as everyone turns to ash
+    gsap.to(camera.position, { x: -30, y: 35, z: 20, duration: 3.5, ease: "power2.out" });
+    document.getElementById("hudDot").style.background = "#f59e0b";
+    document.getElementById("hudLabel").textContent = "CINEMATIC WIDE • THE SNAP";
+  })
+  .call(() => showSubtitle(["THEN...", "A", "SUDDEN", "SNAP", "ECHOES."], { 3: "highlight-red" }))
+  .to("#flash", { opacity: 0.5, duration: 0.12, yoyo: true, repeat: 1 }, "+=0.6")
+  .to(ashMat, { opacity: 0.95, duration: 1.5 }, "<")
+  .call(() => showSubtitle(["EVERYONE", "TURNS", "TO", "DUST."], { 3: "highlight-gold" }), null, "+=0.8")
+  .to(ashMat, { opacity: 0, duration: 1.2 }, "+=2.0")
+  .call(() => {
+    // Reset outriders for seamless loop
+    outriderData.forEach(d => { d.dead = false; d.z = -140 - Math.random() * 200; });
+  });
+
+  // -------------------------------------------------------------
+  // 4. CONTINUOUS RENDER LOOP (60 FPS)
+  // -------------------------------------------------------------
+  function animate() {
+    requestAnimationFrame(animate);
+
+    // Animate Charging Outriders
+    for (let i = 0; i < outriderCount; i++) {
+      const data = outriderData[i];
+      if (!data.dead) {
+        data.z += data.speed;
+        if (data.z > 20) data.z = -240;
+      } else {
+        data.z -= 0.2; // Fallback
+      }
+      dummy.position.set(data.x, 2.5, data.z);
+      dummy.rotation.x = Math.sin(Date.now() * 0.01 + i) * 0.2;
+      dummy.updateMatrix();
+      horde.setMatrixAt(i, dummy.matrix);
+    }
+    horde.instanceMatrix.needsUpdate = true;
+
+    // Animate Ash Disintegration Particles Rising
+    const positions = ashGeo.attributes.position.array;
+    for (let i = 1; i < ashCount * 3; i += 3) {
+      positions[i] += 0.35;
+      if (positions[i] > 80) positions[i] = 0;
+    }
+    ashGeo.attributes.position.needsUpdate = true;
+
+    camera.lookAt(0, 4, -100);
+    renderer.render(scene, camera);
+  }
+  animate();
 </script>
 </body>
 </html>
