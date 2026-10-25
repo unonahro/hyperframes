@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>POV: Wakanda’s Last Stand</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#000;display:grid;place-items:center;font-family:Arial,Helvetica,sans-serif}
+#stage{position:relative;width:1080px;height:1920px;overflow:hidden;background:#050b10;color:#fff}
+.scene{position:absolute;inset:0;opacity:0;pointer-events:none}
+.scene.active{opacity:1}
+svg{position:absolute;inset:0;width:100%;height:100%}
+.caption{position:absolute;left:60px;right:60px;bottom:180px;text-align:center;font-size:64px;font-weight:900;line-height:1.15;text-transform:uppercase;letter-spacing:-1px;text-shadow:0 6px 24px rgba(0,0,0,.8)}
+.caption span{display:inline-block;opacity:0;transform:translateY(30px) scale(.9);margin:0 8px}
+.caption span.on{opacity:1;transform:translateY(0) scale(1);transition:all .18s cubic-bezier(.2,.8,.2,1)}
+.purple{color:#b26bff}.gold{color:#ffd54a}.blue{color:#5ad2ff}.red{color:#ff5252}
+#vignette{position:absolute;inset:0;background:radial-gradient(circle at 50% 45%,transparent 35%,rgba(0,0,0,.75) 100%);pointer-events:none}
+#flash{position:absolute;inset:0;background:#fff;opacity:0;pointer-events:none}
+#shake{position:absolute;inset:-40px}
+@keyframes run{to{transform:translateY(-1400px)}}
+@keyframes pulse{0%,100%{opacity:.25}50%{opacity:.8}}
+@keyframes bolt{0%{opacity:0;transform:scaleY(.2)}20%{opacity:1;transform:scaleY(1)}100%{opacity:0;transform:scaleY(1.1)}}
+@keyframes dust{to{transform:translate(var(--dx),var(--dy)) rotate(var(--r));opacity:0}}
+</style>
+</head>
+<body>
+<div id="stage">
+<div id="shake">
+<section class="scene" id="s1">
+<svg viewBox="0 0 1080 1920">
+<defs><linearGradient id="sky1" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#160b28"/><stop offset="1" stop-color="#2b0f3d"/></linearGradient></defs>
+<rect width="1080" height="1920" fill="url(#sky1)"/>
+<path d="M0 1250 L1080 1250 L1080 1920 L0 1920Z" fill="#20122e"/>
+<path d="M0 1300 Q270 1230 540 1300 T1080 1300 V1920 H0Z" fill="#180d24"/>
+<g id="horde"></g>
+<g id="warrior">
+<rect x="470" y="1290" width="140" height="240" rx="30" fill="#0f1b2d"/>
+<circle cx="540" cy="1230" r="62" fill="#20344f"/>
+<path d="M455 1265 L625 1265 L610 1335 L470 1335Z" fill="#8f7bff" opacity=".9"/>
+<rect x="500" y="1530" width="80" height="180" rx="20" fill="#0b1523"/>
+<rect x="430" y="1370" width="28" height="300" rx="14" fill="#9fb7ff"/>
+</g>
+</svg>
+<div class="caption" data-lines="The dome just shattered.|Millions are coming."></div>
+</section>
+<section class="scene" id="s2">
+<svg viewBox="0 0 1080 1920">
+<rect width="1080" height="1920" fill="#02060d"/>
+<g id="stars"></g>
+<path d="M0 1420 L1080 1420 L1080 1920 L0 1920Z" fill="#081018"/>
+<g id="beam"><path d="M540 -100 L540 1500" stroke="url(#rainbow)" stroke-width="34" stroke-linecap="round" opacity="0"/></g>
+<defs><linearGradient id="rainbow" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ff4fd8"/><stop offset=".35" stop-color="#7a5cff"/><stop offset=".7" stop-color="#37d5ff"/><stop offset="1" stop-color="#fff"/></linearGradient></defs>
+</svg>
+<div class="caption" data-lines="You prepare for the end...|Then the sky tears open."></div>
+</section>
+<section class="scene" id="s3">
+<svg viewBox="0 0 1080 1920">
+<rect width="1080" height="1920" fill="#030a16"/>
+<g id="storm"></g>
+<path d="M0 1450 L1080 1450 L1080 1920 L0 1920Z" fill="#071120"/>
+<g id="thor">
+<circle cx="540" cy="760" r="85" fill="#e8d3b0"/>
+<path d="M430 860 L650 860 L690 1120 L390 1120Z" fill="#31435f"/>
+<rect x="500" y="1120" width="80" height="240" rx="22" fill="#22334c"/>
+<rect x="620" y="930" width="34" height="330" rx="16" fill="#9fb7ff" transform="rotate(18 637 1095)"/>
+</g>
+<g id="army"></g>
+</svg>
+<div class="caption" data-lines="Thor arrives.|Lightning erases them all.|You survived."></div>
+</section>
+<section class="scene" id="s4">
+<svg viewBox="0 0 1080 1920">
+<rect width="1080" height="1920" fill="#05070c"/>
+<path d="M0 1450 L1080 1450 L1080 1920 L0 1920Z" fill="#0a0d14"/>
+<g id="dustField"></g>
+</svg>
+<div class="caption" data-lines="But then...|A snap echoes.|Everyone turns to dust."></div>
+</section>
+</div>
+<div id="vignette"></div>
+<div id="flash"></div>
+</div>
+<script>
+const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
+const scenes=[$('#s1'),$('#s2'),$('#s3'),$('#s4')];
+function caption(el,lines,start,dur){const box=el.querySelector('.caption');box.innerHTML='';const words=[];lines.forEach((line,li)=>{line.split(' ').forEach(w=>{const s=document.createElement('span');s.textContent=w;if(li===1)s.classList.add('gold');if(li===2)s.classList.add('blue');box.appendChild(s);words.push({s,t:start+li*(dur/lines.length)+words.length*.055})})});return words}
+function makeHorde(){const g=$('#horde');g.innerHTML='';for(let i=0;i<70;i++){const x=Math.random()*1080,y=1250+Math.random()*500,s=.35+Math.random()*.9;g.innerHTML+=`<g transform='translate(${x} ${y}) scale(${s})'><ellipse cx='0' cy='0' rx='34' ry='22' fill='#31132e'/><circle cx='0' cy='-30' r='18' fill='#4a1a3d'/><path d='M-12 -48 L0 -78 L12 -48Z' fill='#7a2b58'/></g>`}}
+function makeArmy(){const g=$('#army');g.innerHTML='';for(let i=0;i<90;i++){const x=Math.random()*1080,y=1380+Math.random()*430,s=.3+Math.random()*.8;g.innerHTML+=`<g transform='translate(${x} ${y}) scale(${s})'><ellipse rx='30' ry='18' fill='#2a1024'/><circle cy='-26' r='15' fill='#3d1730'/></g>`}}
+function makeStars(){const g=$('#stars');g.innerHTML='';for(let i=0;i<130;i++)g.innerHTML+=`<circle cx='${Math.random()*1080}' cy='${Math.random()*1200}' r='${Math.random()*2.4+.6}' fill='#fff' opacity='${.2+Math.random()*.8}'/>`}
+function makeStorm(){const g=$('#storm');g.innerHTML='';for(let i=0;i<16;i++){const x=Math.random()*1080;g.innerHTML+=`<path d='M${x} 0 L${x+30} 520 L${x-20} 560 L${x+15} 1080' stroke='#8fd8ff' stroke-width='${4+Math.random()*7}' opacity='.65' style='animation:bolt ${.7+Math.random()*.9}s ${Math.random()*1.5}s infinite'/>`}}
+function makeDust(){const g=$('#dustField');g.innerHTML='';for(let i=0;i<180;i++){const x=Math.random()*1080,y=900+Math.random()*800,d=document.createElementNS('http://www.w3.org/2000/svg','circle');d.setAttribute('cx',x);d.setAttribute('cy',y);d.setAttribute('r',Math.random()*7+2);d.setAttribute('fill','#c9a06a');d.setAttribute('opacity','.9');d.style.setProperty('--dx',(Math.random()*300-150)+'px');d.style.setProperty('--dy',(-200-Math.random()*700)+'px');d.style.setProperty('--r',(Math.random()*720-360)+'deg');d.style.animation=`dust ${2+Math.random()*3}s ${Math.random()*1.5}s forwards`;g.appendChild(d)}}
+function show(i){scenes.forEach((s,x)=>s.classList.toggle('active',x===i));$('#flash').animate([{opacity:0},{opacity:i===2?.9:.35},{opacity:0}],{duration:450,easing:'ease-out'})}
+function shake(){const el=$('#shake');el.animate([{transform:'translate(0,0)'},{transform:'translate(-14px,9px)'},{transform:'translate(12px,-8px)'},{transform:'translate(-7px,5px)'},{transform:'translate(0,0)'}],{duration:520,easing:'ease-out'})}
+makeHorde();makeArmy();makeStars();makeStorm();makeDust();
+const words=[...caption($('#s1'),['The dome just shattered.','Millions are coming.'],0,8),...caption($('#s2'),['You prepare for the end...','Then the sky tears open.'],8,7),...caption($('#s3'),['Thor arrives.','Lightning erases them all.','You survived.'],15,8),...caption($('#s4'),['But then...','A snap echoes.','Everyone turns to dust.'],23,7)];
+const t0=performance.now();
+function loop(now){const t=(now-t0)/1000;words.forEach(w=>{if(t>=w.t)w.s.classList.add('on')});if(t<8)show(0);else if(t<15){show(1);$('#beam path').style.opacity=t>11?Math.min(1,(t-11)*2):0;$('#beam path').setAttribute('stroke-width',t>11?20+(t-11)*30:0)}else if(t<23){show(2);if(Math.random()<.08)shake()}else{show(3);if(Math.random()<.04)shake()}if(t<30)requestAnimationFrame(loop);else{$$('#stage .caption span').forEach(s=>s.classList.remove('on'));t0=performance.now();requestAnimationFrame(loop)}}
+requestAnimationFrame(loop);
+setInterval(()=>{if($('#s1').classList.contains('active')){$$('#horde g').forEach(g=>{const m=g.transform.baseVal.getItem(0);g.setAttribute('transform',`translate(${m.matrix.e} ${m.matrix.f-6}) scale(${m.matrix.d})`)})}},60);
+</script>
+</body>
+</html>
