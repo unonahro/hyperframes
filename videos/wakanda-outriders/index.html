@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>MCU POV: Wakanda 3D Battle Simulator - Realistic Sunset Battlefield</title>
+  <title>MCU POV: Wakanda 3D Battle Simulator - Warriors & Outriders</title>
   <!-- Three.js 3D Engine & GSAP -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
@@ -37,7 +37,6 @@
       z-index: 10;
     }
 
-    /* Cinematic Golden Hour Vignette */
     .cinematic-vignette {
       position: absolute;
       inset: 0;
@@ -167,7 +166,7 @@
 
 <script>
   // -------------------------------------------------------------
-  // 1. THREE.JS 3D SCENE SETUP & BATTLEFIELD IMPROVEMENTS
+  // 1. THREE.JS 3D SCENE SETUP & BATTLEFIELD ENVIRONMENT
   // -------------------------------------------------------------
   const stage = document.getElementById('stage');
   const scene = new THREE.Scene();
@@ -180,7 +179,7 @@
   renderer.setSize(1080, 1920);
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
-  renderer.toneMappingExposure = 1.3;
+  renderer.toneMappingExposure = 1.35;
   document.getElementById('webglCanvas').appendChild(renderer.domElement);
 
   // Lighting
@@ -199,17 +198,16 @@
   flashLight.position.set(0, 40, -100);
   scene.add(flashLight);
 
-  // --- Rolling Wakanda Mountain Ridges & Battlefield Hills ---
+  // Terrain with Rolling Hills
   const terrainGeo = new THREE.PlaneGeometry(900, 900, 64, 64);
   terrainGeo.rotateX(-Math.PI / 2);
   const pos = terrainGeo.attributes.position;
   for (let i = 0; i < pos.count; i++) {
     const x = pos.getX(i);
     const z = pos.getZ(i);
-    // Natural rolling terrain and background mountains
     let y = Math.sin(x * 0.015) * Math.cos(z * 0.015) * 12;
     if (Math.abs(x) > 160 || z < -180) {
-      y += Math.sin(x * 0.03) * 35 + Math.cos(z * 0.03) * 45; // Mountain ranges
+      y += Math.sin(x * 0.03) * 35 + Math.cos(z * 0.03) * 45;
     }
     pos.setY(i, y);
   }
@@ -224,43 +222,110 @@
   const terrain = new THREE.Mesh(terrainGeo, terrainMat);
   scene.add(terrain);
 
-  // --- Wakandan Warrior Defense Line (Spears with Glowing Tips) ---
-  const troopCount = 45;
-  const spearGeo = new THREE.CylinderGeometry(0.12, 0.12, 8, 8);
-  const spearMat = new THREE.MeshStandardMaterial({ color: 0x94a3b8, metalness: 0.8, roughness: 0.2 });
-  const tipGeo = new THREE.ConeGeometry(0.3, 1.4, 8);
-  const tipMat = new THREE.MeshBasicMaterial({ color: 0x38bdf8 });
+  // -------------------------------------------------------------
+  // 2. 3D HUMAN WAKANDAN WARRIORS (ARMY FORMATION)
+  // -------------------------------------------------------------
+  function createWakandanWarrior() {
+    const warrior = new THREE.Group();
 
-  const spearGroup = new THREE.Group();
-  for (let i = 0; i < troopCount; i++) {
-    const s = new THREE.Mesh(spearGeo, spearMat);
-    const t = new THREE.Mesh(tipGeo, tipMat);
-    t.position.y = 4.2;
-    s.add(t);
+    // Torso / Vibranium Armor
+    const torsoGeo = new THREE.CylinderGeometry(1.2, 0.9, 3.2, 8);
+    const armorMat = new THREE.MeshStandardMaterial({ color: 0x1e293b, metalness: 0.8, roughness: 0.2 });
+    const torso = new THREE.Mesh(torsoGeo, armorMat);
+    torso.position.y = 3.6;
+    warrior.add(torso);
 
-    const x = (i % 15 - 7) * 9 + (Math.random() - 0.5) * 3;
-    const row = Math.floor(i / 15);
-    const z = -20 - row * 12 + (Math.random() - 0.5) * 4;
-    s.position.set(x, 4, z);
-    s.rotation.x = -0.2 - Math.random() * 0.15;
-    s.rotation.z = (Math.random() - 0.5) * 0.1;
-    spearGroup.add(s);
+    // Head
+    const headGeo = new THREE.SphereGeometry(0.75, 12, 12);
+    const skinMat = new THREE.MeshStandardMaterial({ color: 0x3e2723, roughness: 0.6 });
+    const head = new THREE.Mesh(headGeo, skinMat);
+    head.position.y = 5.8;
+    warrior.add(head);
+
+    // Legs
+    const legGeo = new THREE.CylinderGeometry(0.4, 0.35, 2.8, 6);
+    const legL = new THREE.Mesh(legGeo, armorMat);
+    legL.position.set(-0.55, 1.4, 0);
+    const legR = new THREE.Mesh(legGeo, armorMat);
+    legR.position.set(0.55, 1.4, 0);
+    warrior.add(legL, legR);
+
+    // Vibranium Spear with Glowing Energy Tip
+    const spearGeo = new THREE.CylinderGeometry(0.08, 0.08, 8.5, 8);
+    const spearMat = new THREE.MeshStandardMaterial({ color: 0x94a3b8, metalness: 0.9, roughness: 0.1 });
+    const spear = new THREE.Mesh(spearGeo, spearMat);
+    spear.position.set(1.4, 4.5, -0.6);
+    spear.rotation.x = -0.3;
+
+    const tipGeo = new THREE.ConeGeometry(0.28, 1.4, 8);
+    const tipMat = new THREE.MeshBasicMaterial({ color: 0x38bdf8 });
+    const tip = new THREE.Mesh(tipGeo, tipMat);
+    tip.position.y = 4.4;
+    spear.add(tip);
+    warrior.add(spear);
+
+    // Vibranium Energy Shield (Left Arm)
+    const shieldGeo = new THREE.CylinderGeometry(1.4, 1.4, 0.15, 8);
+    shieldGeo.rotateX(Math.PI / 2);
+    const shieldMat = new THREE.MeshStandardMaterial({ color: 0x0ea5e9, emissive: 0x0284c7, emissiveIntensity: 0.5, metalness: 0.8 });
+    const shield = new THREE.Mesh(shieldGeo, shieldMat);
+    shield.position.set(-1.4, 4.0, 0.6);
+    warrior.add(shield);
+
+    return warrior;
   }
-  scene.add(spearGroup);
 
-  // --- Wakandan Dome Shield with Amber Wireframe ---
-  const domeGeo = new THREE.SphereGeometry(220, 36, 28, 0, Math.PI * 2, 0, Math.PI / 2);
-  const domeMat = new THREE.MeshBasicMaterial({
-    color: 0xfb923c,
-    wireframe: true,
-    transparent: true,
-    opacity: 0.32
-  });
-  const dome = new THREE.Mesh(domeGeo, domeMat);
-  dome.position.set(0, 0, -140);
-  scene.add(dome);
+  // Create an army of 40 Wakandan human warriors standing beside and in front of you
+  const warriorGroup = new THREE.Group();
+  const warriorList = [];
+  for (let row = 0; row < 4; row++) {
+    for (let col = -5; col <= 5; col++) {
+      if (row === 0 && Math.abs(col) <= 1) continue; // Clear direct center for 1st-person camera
+      const w = createWakandanWarrior();
+      const x = col * 8 + (Math.random() - 0.5) * 2;
+      const z = -row * 10 - 8 + (Math.random() - 0.5) * 3;
+      w.position.set(x, 0, z);
+      warriorGroup.add(w);
+      warriorList.push(w);
+    }
+  }
+  scene.add(warriorGroup);
 
-  // --- Outrider Swarm Horde ---
+  // -------------------------------------------------------------
+  // 3. FIRST-PERSON POV ARMS & SPEAR (Visible in Player View)
+  // -------------------------------------------------------------
+  const povArms = new THREE.Group();
+
+  // Right Hand & Vibranium Spear
+  const mySpearGeo = new THREE.CylinderGeometry(0.09, 0.09, 9, 8);
+  const mySpearMat = new THREE.MeshStandardMaterial({ color: 0xcfd8dc, metalness: 0.9, roughness: 0.1 });
+  const mySpear = new THREE.Mesh(mySpearGeo, mySpearMat);
+  mySpear.position.set(1.8, -0.2, -2.4);
+  mySpear.rotation.x = -1.25;
+  mySpear.rotation.z = -0.2;
+
+  const myTipGeo = new THREE.ConeGeometry(0.32, 1.6, 8);
+  const myTipMat = new THREE.MeshBasicMaterial({ color: 0x38bdf8 });
+  const myTip = new THREE.Mesh(myTipGeo, myTipMat);
+  myTip.position.y = 4.6;
+  mySpear.add(myTip);
+  povArms.add(mySpear);
+
+  // Left Arm Vibranium Shield
+  const myShieldGeo = new THREE.CylinderGeometry(1.6, 1.6, 0.18, 8);
+  myShieldGeo.rotateX(Math.PI / 2);
+  const myShieldMat = new THREE.MeshStandardMaterial({ color: 0x0ea5e9, emissive: 0x0284c7, emissiveIntensity: 0.6, metalness: 0.8 });
+  const myShield = new THREE.Mesh(myShieldGeo, myShieldMat);
+  myShield.position.set(-1.8, -0.6, -2.2);
+  myShield.rotation.y = 0.4;
+  povArms.add(myShield);
+
+  camera.add(povArms);
+  scene.add(camera);
+
+  // -------------------------------------------------------------
+  // 4. CHARGING OUTRIDER SWARM & BIFROST
+  // -------------------------------------------------------------
   const outriderCount = 180;
   const outriderGeo = new THREE.ConeGeometry(1.8, 5.5, 5);
   outriderGeo.rotateX(Math.PI / 2);
@@ -277,7 +342,7 @@
   for (let i = 0; i < outriderCount; i++) {
     const x = (Math.random() - 0.5) * 220;
     const z = -160 - Math.random() * 240;
-    const speed = 0.22 + Math.random() * 0.2; // Slower, heavier charge speed
+    const speed = 0.22 + Math.random() * 0.2;
     outriderData.push({ x, z, speed, dead: false });
     dummy.position.set(x, 3.0, z);
     dummy.updateMatrix();
@@ -285,7 +350,19 @@
   }
   scene.add(horde);
 
-  // --- Bifrost Beam ---
+  // Dome Shield
+  const domeGeo = new THREE.SphereGeometry(220, 36, 28, 0, Math.PI * 2, 0, Math.PI / 2);
+  const domeMat = new THREE.MeshBasicMaterial({
+    color: 0xfb923c,
+    wireframe: true,
+    transparent: true,
+    opacity: 0.32
+  });
+  const dome = new THREE.Mesh(domeGeo, domeMat);
+  dome.position.set(0, 0, -140);
+  scene.add(dome);
+
+  // Bifrost Beam
   const beamGeo = new THREE.CylinderGeometry(10, 10, 380, 24, 1, true);
   const beamMat = new THREE.MeshBasicMaterial({
     color: 0x38bdf8,
@@ -297,7 +374,7 @@
   bifrostBeam.position.set(0, 190, -80);
   scene.add(bifrostBeam);
 
-  // --- Disintegration Ash Cloud ---
+  // Disintegration Ash Cloud
   const ashCount = 900;
   const ashGeo = new THREE.BufferGeometry();
   const ashPositions = new Float32Array(ashCount * 3);
@@ -317,7 +394,7 @@
   scene.add(ashCloud);
 
   // -------------------------------------------------------------
-  // 2. KINETIC SUBTITLE ENGINE (PACE-MATCHED)
+  // 5. KINETIC SUBTITLE ENGINE
   // -------------------------------------------------------------
   function showSubtitle(words, highlights = {}) {
     const box = document.getElementById("captionTarget");
@@ -343,14 +420,15 @@
   }
 
   // -------------------------------------------------------------
-  // 3. SLOWER, MORE CINEMATIC CAMERA PACING (38s TOTAL LOOP)
+  // 6. CINEMATIC 3D TIMELINE
   // -------------------------------------------------------------
   const master = gsap.timeline({ repeat: -1 });
 
-  // SCENE 1: First-Person Frontline Stand (0:00 - 0:10) - 10s
+  // SCENE 1: First-Person Frontline Stand with Army (0:00 - 0:10)
   master.call(() => {
-    camera.position.set(0, 4.2, 5);
-    camera.lookAt(0, 4.2, -100);
+    camera.position.set(0, 4.5, 4);
+    camera.lookAt(0, 4.5, -100);
+    povArms.visible = true;
     domeMat.opacity = 0.35;
     domeMat.color.setHex(0xe11d48);
     document.getElementById("hudDot").style.background = "#e11d48";
@@ -362,8 +440,9 @@
   .to("#stage", { x: "+=10", y: "-=10", duration: 0.06, repeat: 16, yoyo: true }, "+=0.4")
   .to(camera.position, { z: -25, duration: 3.5, ease: "power1.out" })
 
-  // SCENE 2: Cinematic Drone Far-Away Shot + Bifrost Beam (0:10 - 0:20) - 10s
+  // SCENE 2: Cinematic Drone Far-Away Shot + Bifrost Beam (0:10 - 0:20)
   .call(() => {
+    povArms.visible = false;
     gsap.to(camera.position, { x: 60, y: 85, z: 90, duration: 3.0, ease: "power2.out" });
     document.getElementById("hudDot").style.background = "#38bdf8";
     document.getElementById("hudLabel").textContent = "AERIAL VIEW • BIFROST TEAR";
@@ -375,10 +454,11 @@
   .call(() => showSubtitle(["UNTIL", "A", "RAINBOW", "BEAM", "TEARS", "THE", "SKY!"], { 2: "highlight-cyan", 6: "highlight-neon" }))
   .to(bifrostBeam.material, { opacity: 0, duration: 1.2 }, "+=2.8")
 
-  // SCENE 3: First-Person Thor Lightning Arrival (0:20 - 0:30) - 10s
+  // SCENE 3: First-Person Thor Lightning Arrival (0:20 - 0:30)
   .call(() => {
-    camera.position.set(0, 4.2, -45);
-    camera.lookAt(0, 4.2, -120);
+    povArms.visible = true;
+    camera.position.set(0, 4.5, -45);
+    camera.lookAt(0, 4.5, -120);
     document.getElementById("hudDot").style.background = "#22c55e";
     document.getElementById("hudLabel").textContent = "1ST PERSON POV • THOR ARRIVAL";
   })
@@ -392,8 +472,9 @@
   .call(() => showSubtitle(["YOU", "ACTUALLY", "SURVIVED."], { 2: "highlight-neon" }), null, "+=2.8")
   .to(camera.position, { z: -55, duration: 3.0, ease: "power1.out" })
 
-  // SCENE 4: Panoramic Orbit & The Snap Disintegration (0:30 - 0:38) - 8s
+  // SCENE 4: Panoramic Orbit & The Snap Disintegration (0:30 - 0:38)
   .call(() => {
+    povArms.visible = false;
     gsap.to(camera.position, { x: -45, y: 40, z: 30, duration: 5.0, ease: "power1.inOut" });
     document.getElementById("hudDot").style.background = "#f59e0b";
     document.getElementById("hudLabel").textContent = "CINEMATIC PAN • THE SNAP";
@@ -408,17 +489,22 @@
   });
 
   // -------------------------------------------------------------
-  // 4. ANIMATION LOOP
+  // 7. ANIMATION LOOP
   // -------------------------------------------------------------
   function animate() {
     requestAnimationFrame(animate);
 
-    // Spear Frontline Subtle Breathing Animation
-    spearGroup.children.forEach((s, idx) => {
-      s.rotation.x = -0.2 + Math.sin(Date.now() * 0.002 + idx) * 0.04;
+    // Warriors Combat Idle & Spear Stances
+    warriorList.forEach((w, idx) => {
+      w.rotation.y = Math.sin(Date.now() * 0.003 + idx) * 0.08;
+      w.children[0].position.y = 3.6 + Math.sin(Date.now() * 0.005 + idx) * 0.08; // Torso breathing
     });
 
-    // Outrider Horde Motion
+    // First-Person Arms Movement (Breathing & Weapon Sway)
+    mySpear.position.y = -0.2 + Math.sin(Date.now() * 0.004) * 0.06;
+    myShield.position.y = -0.6 + Math.cos(Date.now() * 0.004) * 0.05;
+
+    // Outrider Swarm Movement
     for (let i = 0; i < outriderCount; i++) {
       const data = outriderData[i];
       if (!data.dead) {
@@ -437,7 +523,7 @@
     // Rising Golden Sunset Ash Particles
     const positions = ashGeo.attributes.position.array;
     for (let i = 1; i < ashCount * 3; i += 3) {
-      positions[i] += 0.22; // Slower floating embers
+      positions[i] += 0.22;
       if (positions[i] > 90) positions[i] = 0;
     }
     ashGeo.attributes.position.needsUpdate = true;
