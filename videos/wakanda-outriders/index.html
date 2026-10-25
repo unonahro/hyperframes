@@ -1,103 +1,438 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>POV: Wakanda’s Last Stand</title>
-<style>
-*{margin:0;padding:0;box-sizing:border-box}
-body{background:#000;display:grid;place-items:center;font-family:Arial,Helvetica,sans-serif}
-#stage{position:relative;width:1080px;height:1920px;overflow:hidden;background:#050b10;color:#fff}
-.scene{position:absolute;inset:0;opacity:0;pointer-events:none}
-.scene.active{opacity:1}
-svg{position:absolute;inset:0;width:100%;height:100%}
-.caption{position:absolute;left:60px;right:60px;bottom:180px;text-align:center;font-size:64px;font-weight:900;line-height:1.15;text-transform:uppercase;letter-spacing:-1px;text-shadow:0 6px 24px rgba(0,0,0,.8)}
-.caption span{display:inline-block;opacity:0;transform:translateY(30px) scale(.9);margin:0 8px}
-.caption span.on{opacity:1;transform:translateY(0) scale(1);transition:all .18s cubic-bezier(.2,.8,.2,1)}
-.purple{color:#b26bff}.gold{color:#ffd54a}.blue{color:#5ad2ff}.red{color:#ff5252}
-#vignette{position:absolute;inset:0;background:radial-gradient(circle at 50% 45%,transparent 35%,rgba(0,0,0,.75) 100%);pointer-events:none}
-#flash{position:absolute;inset:0;background:#fff;opacity:0;pointer-events:none}
-#shake{position:absolute;inset:-40px}
-@keyframes run{to{transform:translateY(-1400px)}}
-@keyframes pulse{0%,100%{opacity:.25}50%{opacity:.8}}
-@keyframes bolt{0%{opacity:0;transform:scaleY(.2)}20%{opacity:1;transform:scaleY(1)}100%{opacity:0;transform:scaleY(1.1)}}
-@keyframes dust{to{transform:translate(var(--dx),var(--dy)) rotate(var(--r));opacity:0}}
-</style>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MCU POV: Wakanda's Front Line</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Cabinet+Grotesk:wght@800;900&family=Plus+Jakarta+Sans:wght@700;800;900&display=swap');
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background: #030508;
+      display: grid;
+      place-items: center;
+      min-height: 100vh;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      overflow: hidden;
+    }
+
+    #viewport {
+      position: relative;
+      width: 1080px;
+      height: 1920px;
+      background: radial-gradient(circle at 50% 30%, #151a28 0%, #060911 70%, #020306 100%);
+      overflow: hidden;
+      box-shadow: 0 0 120px rgba(0, 0, 0, 0.95);
+    }
+
+    /* Ambient Film Grain & Vignette */
+    .film-grain {
+      position: absolute;
+      inset: 0;
+      opacity: 0.12;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 90;
+    }
+    .cinematic-vignette {
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at 50% 50%, transparent 40%, rgba(2, 4, 8, 0.85) 100%);
+      pointer-events: none;
+      z-index: 80;
+    }
+
+    /* Top HUD Badge */
+    .hud-pill {
+      position: absolute;
+      top: 140px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(14, 20, 32, 0.75);
+      border: 1.5px solid rgba(255, 255, 255, 0.14);
+      backdrop-filter: blur(24px) saturate(180%);
+      padding: 18px 44px;
+      border-radius: 999px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.25);
+      z-index: 70;
+    }
+    .hud-dot {
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: #ef4444;
+      box-shadow: 0 0 18px #ef4444;
+    }
+    .hud-pill span {
+      font-size: 26px;
+      font-weight: 800;
+      letter-spacing: 4px;
+      text-transform: uppercase;
+      color: #f8fafc;
+    }
+
+    /* Main Realistic 3D Stage Glass Card */
+    .canvas-card {
+      position: absolute;
+      top: 310px;
+      left: 80px;
+      right: 80px;
+      height: 1040px;
+      border-radius: 48px;
+      background: linear-gradient(175deg, rgba(22, 30, 48, 0.75) 0%, rgba(8, 12, 22, 0.92) 100%);
+      border: 1.5px solid rgba(255, 255, 255, 0.12);
+      box-shadow: 
+        0 40px 100px rgba(0, 0, 0, 0.8),
+        inset 0 1px 2px rgba(255, 255, 255, 0.2),
+        inset 0 -1px 2px rgba(0, 0, 0, 0.5);
+      overflow: hidden;
+      z-index: 20;
+    }
+
+    .scene-layer {
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    /* Tactical Depth Grid & Radar */
+    .radar-grid {
+      position: absolute;
+      inset: 0;
+      background-image: 
+        radial-gradient(circle at 50% 50%, rgba(56, 189, 248, 0.08) 0%, transparent 65%),
+        linear-gradient(rgba(255, 255, 255, 0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
+      background-size: 100% 100%, 50px 50px, 50px 50px;
+    }
+
+    /* High-Impact Word-by-Word Subtitle Bar */
+    .caption-wrapper {
+      position: absolute;
+      bottom: 210px;
+      left: 70px;
+      right: 70px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 70;
+      min-height: 180px;
+    }
+    .caption-pill {
+      background: rgba(10, 15, 26, 0.88);
+      border: 1.5px solid rgba(255, 255, 255, 0.16);
+      backdrop-filter: blur(28px);
+      padding: 30px 48px;
+      border-radius: 40px;
+      box-shadow: 0 25px 70px rgba(0, 0, 0, 0.85);
+      text-align: center;
+    }
+    .cap-word {
+      display: inline-block;
+      font-family: 'Cabinet Grotesk', sans-serif;
+      font-size: 58px;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: -1px;
+      line-height: 1.15;
+      color: #ffffff;
+      margin: 0 10px;
+      opacity: 0;
+      transform: translateY(24px) scale(0.8);
+      filter: blur(8px);
+    }
+    .cap-word.highlight-neon {
+      color: #22c55e;
+      text-shadow: 0 0 35px rgba(34, 197, 94, 0.8), 0 0 10px rgba(34, 197, 94, 0.5);
+    }
+    .cap-word.highlight-gold {
+      color: #fbbf24;
+      text-shadow: 0 0 35px rgba(251, 191, 36, 0.8), 0 0 10px rgba(251, 191, 36, 0.5);
+    }
+    .cap-word.highlight-cyan {
+      color: #38bdf8;
+      text-shadow: 0 0 35px rgba(56, 189, 248, 0.8), 0 0 10px rgba(56, 189, 248, 0.5);
+    }
+    .cap-word.highlight-crimson {
+      color: #ef4444;
+      text-shadow: 0 0 35px rgba(239, 68, 68, 0.8), 0 0 10px rgba(239, 68, 68, 0.5);
+    }
+
+    /* Screen Effects */
+    #impactFlash {
+      position: absolute;
+      inset: 0;
+      background: #ffffff;
+      opacity: 0;
+      pointer-events: none;
+      z-index: 100;
+    }
+  </style>
 </head>
 <body>
-<div id="stage">
-<div id="shake">
-<section class="scene" id="s1">
-<svg viewBox="0 0 1080 1920">
-<defs><linearGradient id="sky1" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#160b28"/><stop offset="1" stop-color="#2b0f3d"/></linearGradient></defs>
-<rect width="1080" height="1920" fill="url(#sky1)"/>
-<path d="M0 1250 L1080 1250 L1080 1920 L0 1920Z" fill="#20122e"/>
-<path d="M0 1300 Q270 1230 540 1300 T1080 1300 V1920 H0Z" fill="#180d24"/>
-<g id="horde"></g>
-<g id="warrior">
-<rect x="470" y="1290" width="140" height="240" rx="30" fill="#0f1b2d"/>
-<circle cx="540" cy="1230" r="62" fill="#20344f"/>
-<path d="M455 1265 L625 1265 L610 1335 L470 1335Z" fill="#8f7bff" opacity=".9"/>
-<rect x="500" y="1530" width="80" height="180" rx="20" fill="#0b1523"/>
-<rect x="430" y="1370" width="28" height="300" rx="14" fill="#9fb7ff"/>
-</g>
-</svg>
-<div class="caption" data-lines="The dome just shattered.|Millions are coming."></div>
-</section>
-<section class="scene" id="s2">
-<svg viewBox="0 0 1080 1920">
-<rect width="1080" height="1920" fill="#02060d"/>
-<g id="stars"></g>
-<path d="M0 1420 L1080 1420 L1080 1920 L0 1920Z" fill="#081018"/>
-<g id="beam"><path d="M540 -100 L540 1500" stroke="url(#rainbow)" stroke-width="34" stroke-linecap="round" opacity="0"/></g>
-<defs><linearGradient id="rainbow" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ff4fd8"/><stop offset=".35" stop-color="#7a5cff"/><stop offset=".7" stop-color="#37d5ff"/><stop offset="1" stop-color="#fff"/></linearGradient></defs>
-</svg>
-<div class="caption" data-lines="You prepare for the end...|Then the sky tears open."></div>
-</section>
-<section class="scene" id="s3">
-<svg viewBox="0 0 1080 1920">
-<rect width="1080" height="1920" fill="#030a16"/>
-<g id="storm"></g>
-<path d="M0 1450 L1080 1450 L1080 1920 L0 1920Z" fill="#071120"/>
-<g id="thor">
-<circle cx="540" cy="760" r="85" fill="#e8d3b0"/>
-<path d="M430 860 L650 860 L690 1120 L390 1120Z" fill="#31435f"/>
-<rect x="500" y="1120" width="80" height="240" rx="22" fill="#22334c"/>
-<rect x="620" y="930" width="34" height="330" rx="16" fill="#9fb7ff" transform="rotate(18 637 1095)"/>
-</g>
-<g id="army"></g>
-</svg>
-<div class="caption" data-lines="Thor arrives.|Lightning erases them all.|You survived."></div>
-</section>
-<section class="scene" id="s4">
-<svg viewBox="0 0 1080 1920">
-<rect width="1080" height="1920" fill="#05070c"/>
-<path d="M0 1450 L1080 1450 L1080 1920 L0 1920Z" fill="#0a0d14"/>
-<g id="dustField"></g>
-</svg>
-<div class="caption" data-lines="But then...|A snap echoes.|Everyone turns to dust."></div>
-</section>
+
+<div id="viewport">
+  <div class="radar-grid"></div>
+
+  <!-- Top Status Pill -->
+  <div class="hud-pill">
+    <div class="hud-dot" id="hudDot"></div>
+    <span id="hudLabel">MCU POV • WAKANDA BORDER</span>
+  </div>
+
+  <!-- Central Neumorphic Visual Card -->
+  <div class="canvas-card" id="cardBox">
+    
+    <!-- Scene 1: Realistic Barrier Fracture & Charging Swarm -->
+    <div class="scene-layer" id="scene1">
+      <svg width="920" height="1040" viewBox="0 0 920 1040">
+        <defs>
+          <filter id="softGlow" x="-20%" y="-20%" width="140%" height="140%">
+            <feGaussianBlur stdDeviation="12" result="blur"/>
+            <feMerge>
+              <feMergeNode in="blur"/>
+              <feMergeNode in="SourceGraphic"/>
+            </feMerge>
+          </filter>
+          <radialGradient id="barrierPulse" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stop-color="#38bdf8" stop-opacity="0.35"/>
+            <stop offset="70%" stop-color="#0284c7" stop-opacity="0.12"/>
+            <stop offset="100%" stop-color="#0284c7" stop-opacity="0"/>
+          </radialGradient>
+        </defs>
+
+        <!-- Defensive Wakandan Perimeter Ring -->
+        <circle cx="460" cy="520" r="380" fill="url(#barrierPulse)" stroke="rgba(56, 189, 248, 0.25)" stroke-width="2"/>
+        <circle cx="460" cy="520" r="280" fill="none" stroke="rgba(255, 255, 255, 0.08)" stroke-width="1.5" stroke-dasharray="10 10"/>
+
+        <!-- Intricate Hexagonal Energy Shield -->
+        <g id="shieldMesh" filter="url(#softGlow)" stroke="#38bdf8" stroke-width="3" fill="rgba(14, 165, 233, 0.08)">
+          <polygon points="460,240 540,285 540,375 460,420 380,375 380,285"/>
+          <polygon points="545,288 625,333 625,423 545,468 465,423 465,333"/>
+          <polygon points="375,288 455,333 455,423 375,468 295,423 295,333"/>
+          <polygon points="460,425 540,470 540,560 460,605 380,560 380,470"/>
+        </g>
+
+        <!-- Dynamic Enemy Outrider Clusters -->
+        <g id="enemySwarm"></g>
+
+        <!-- Frontline Defenders -->
+        <g id="wakandaTroops">
+          <circle cx="460" cy="740" r="22" fill="#22c55e" filter="url(#softGlow)"/>
+          <circle cx="390" cy="770" r="16" fill="#0ea5e9"/>
+          <circle cx="530" cy="770" r="16" fill="#0ea5e9"/>
+          <circle cx="320" cy="800" r="12" fill="#64748b"/>
+          <circle cx="600" cy="800" r="12" fill="#64748b"/>
+        </g>
+      </svg>
+    </div>
+
+    <!-- Scene 2: Cinematic Bifrost Pillar -->
+    <div class="scene-layer" id="scene2">
+      <svg width="920" height="1040" viewBox="0 0 920 1040">
+        <defs>
+          <linearGradient id="bifrostBeamGrad" x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0%" stop-color="#ec4899" stop-opacity="0.8"/>
+            <stop offset="25%" stop-color="#8b5cf6" stop-opacity="0.9"/>
+            <stop offset="50%" stop-color="#38bdf8" stop-opacity="1"/>
+            <stop offset="75%" stop-color="#06b6d4" stop-opacity="0.9"/>
+            <stop offset="100%" stop-color="#10b981" stop-opacity="0.8"/>
+          </linearGradient>
+          <filter id="intenseBeamBlur">
+            <feGaussianBlur stdDeviation="30" result="outerGlow"/>
+            <feGaussianBlur stdDeviation="10" result="innerGlow"/>
+            <feMerge>
+              <feMergeNode in="outerGlow"/>
+              <feMergeNode in="innerGlow"/>
+              <feMergeNode in="SourceGraphic"/>
+            </feMerge>
+          </filter>
+        </defs>
+
+        <!-- Vertical Laser Beam Core -->
+        <rect id="beamCore" x="370" y="0" width="180" height="880" fill="url(#bifrostBeamGrad)" filter="url(#intenseBeamBlur)" opacity="0"/>
+        
+        <!-- Concentric Impact Shockwaves -->
+        <ellipse id="impactRings1" cx="460" cy="880" rx="340" ry="60" fill="none" stroke="#38bdf8" stroke-width="8" opacity="0"/>
+        <ellipse id="impactRings2" cx="460" cy="880" rx="220" ry="40" fill="rgba(56, 189, 248, 0.25)" opacity="0"/>
+      </svg>
+    </div>
+
+    <!-- Scene 3: Thor Lightning Arc Overdrive -->
+    <div class="scene-layer" id="scene3">
+      <svg width="920" height="1040" viewBox="0 0 920 1040">
+        <defs>
+          <filter id="boltGlow">
+            <feGaussianBlur stdDeviation="14" result="glow"/>
+            <feMerge>
+              <feMergeNode in="glow"/>
+              <feMergeNode in="SourceGraphic"/>
+            </feMerge>
+          </filter>
+        </defs>
+
+        <!-- Lightning Arcs -->
+        <g id="lightningCanvas" stroke="#e0f2fe" stroke-width="7" stroke-linecap="round" stroke-linejoin="round" fill="none" filter="url(#boltGlow)" opacity="0">
+          <path d="M460,420 L320,240 L220,310 L90,180"/>
+          <path d="M460,420 L600,240 L700,320 L830,190"/>
+          <path d="M460,420 L340,640 L190,690 L80,860"/>
+          <path d="M460,420 L580,640 L730,690 L840,860"/>
+          <path d="M460,420 L460,110 L500,60"/>
+          <path d="M460,420 L460,820 L420,940"/>
+        </g>
+
+        <!-- Stormbreaker Radial Pulse -->
+        <circle id="thorCenter" cx="460" cy="420" r="50" fill="#ffffff" filter="url(#boltGlow)"/>
+      </svg>
+    </div>
+
+    <!-- Scene 4: The Snap & Disintegration Dust Particles -->
+    <div class="scene-layer" id="scene4">
+      <svg width="920" height="1040" viewBox="0 0 920 1040">
+        <!-- Golden Shockwave Ring -->
+        <circle id="snapShockwave" cx="460" cy="460" r="20" fill="none" stroke="#fbbf24" stroke-width="8" opacity="0"/>
+        
+        <!-- Emitted Ash & Ember Particles -->
+        <g id="ashField"></g>
+      </svg>
+    </div>
+
+  </div>
+
+  <!-- Dynamic TikTok Word-by-Word Subtitles -->
+  <div class="caption-wrapper">
+    <div class="caption-pill" id="subtitleBox">
+      <!-- Words injected by GSAP -->
+    </div>
+  </div>
+
+  <div id="impactFlash"></div>
+  <div class="film-grain"></div>
+  <div class="cinematic-vignette"></div>
 </div>
-<div id="vignette"></div>
-<div id="flash"></div>
-</div>
+
 <script>
-const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
-const scenes=[$('#s1'),$('#s2'),$('#s3'),$('#s4')];
-function caption(el,lines,start,dur){const box=el.querySelector('.caption');box.innerHTML='';const words=[];lines.forEach((line,li)=>{line.split(' ').forEach(w=>{const s=document.createElement('span');s.textContent=w;if(li===1)s.classList.add('gold');if(li===2)s.classList.add('blue');box.appendChild(s);words.push({s,t:start+li*(dur/lines.length)+words.length*.055})})});return words}
-function makeHorde(){const g=$('#horde');g.innerHTML='';for(let i=0;i<70;i++){const x=Math.random()*1080,y=1250+Math.random()*500,s=.35+Math.random()*.9;g.innerHTML+=`<g transform='translate(${x} ${y}) scale(${s})'><ellipse cx='0' cy='0' rx='34' ry='22' fill='#31132e'/><circle cx='0' cy='-30' r='18' fill='#4a1a3d'/><path d='M-12 -48 L0 -78 L12 -48Z' fill='#7a2b58'/></g>`}}
-function makeArmy(){const g=$('#army');g.innerHTML='';for(let i=0;i<90;i++){const x=Math.random()*1080,y=1380+Math.random()*430,s=.3+Math.random()*.8;g.innerHTML+=`<g transform='translate(${x} ${y}) scale(${s})'><ellipse rx='30' ry='18' fill='#2a1024'/><circle cy='-26' r='15' fill='#3d1730'/></g>`}}
-function makeStars(){const g=$('#stars');g.innerHTML='';for(let i=0;i<130;i++)g.innerHTML+=`<circle cx='${Math.random()*1080}' cy='${Math.random()*1200}' r='${Math.random()*2.4+.6}' fill='#fff' opacity='${.2+Math.random()*.8}'/>`}
-function makeStorm(){const g=$('#storm');g.innerHTML='';for(let i=0;i<16;i++){const x=Math.random()*1080;g.innerHTML+=`<path d='M${x} 0 L${x+30} 520 L${x-20} 560 L${x+15} 1080' stroke='#8fd8ff' stroke-width='${4+Math.random()*7}' opacity='.65' style='animation:bolt ${.7+Math.random()*.9}s ${Math.random()*1.5}s infinite'/>`}}
-function makeDust(){const g=$('#dustField');g.innerHTML='';for(let i=0;i<180;i++){const x=Math.random()*1080,y=900+Math.random()*800,d=document.createElementNS('http://www.w3.org/2000/svg','circle');d.setAttribute('cx',x);d.setAttribute('cy',y);d.setAttribute('r',Math.random()*7+2);d.setAttribute('fill','#c9a06a');d.setAttribute('opacity','.9');d.style.setProperty('--dx',(Math.random()*300-150)+'px');d.style.setProperty('--dy',(-200-Math.random()*700)+'px');d.style.setProperty('--r',(Math.random()*720-360)+'deg');d.style.animation=`dust ${2+Math.random()*3}s ${Math.random()*1.5}s forwards`;g.appendChild(d)}}
-function show(i){scenes.forEach((s,x)=>s.classList.toggle('active',x===i));$('#flash').animate([{opacity:0},{opacity:i===2?.9:.35},{opacity:0}],{duration:450,easing:'ease-out'})}
-function shake(){const el=$('#shake');el.animate([{transform:'translate(0,0)'},{transform:'translate(-14px,9px)'},{transform:'translate(12px,-8px)'},{transform:'translate(-7px,5px)'},{transform:'translate(0,0)'}],{duration:520,easing:'ease-out'})}
-makeHorde();makeArmy();makeStars();makeStorm();makeDust();
-const words=[...caption($('#s1'),['The dome just shattered.','Millions are coming.'],0,8),...caption($('#s2'),['You prepare for the end...','Then the sky tears open.'],8,7),...caption($('#s3'),['Thor arrives.','Lightning erases them all.','You survived.'],15,8),...caption($('#s4'),['But then...','A snap echoes.','Everyone turns to dust.'],23,7)];
-const t0=performance.now();
-function loop(now){const t=(now-t0)/1000;words.forEach(w=>{if(t>=w.t)w.s.classList.add('on')});if(t<8)show(0);else if(t<15){show(1);$('#beam path').style.opacity=t>11?Math.min(1,(t-11)*2):0;$('#beam path').setAttribute('stroke-width',t>11?20+(t-11)*30:0)}else if(t<23){show(2);if(Math.random()<.08)shake()}else{show(3);if(Math.random()<.04)shake()}if(t<30)requestAnimationFrame(loop);else{$$('#stage .caption span').forEach(s=>s.classList.remove('on'));t0=performance.now();requestAnimationFrame(loop)}}
-requestAnimationFrame(loop);
-setInterval(()=>{if($('#s1').classList.contains('active')){$$('#horde g').forEach(g=>{const m=g.transform.baseVal.getItem(0);g.setAttribute('transform',`translate(${m.matrix.e} ${m.matrix.f-6}) scale(${m.matrix.d})`)})}},60);
+  // Generate 60 Organic Outrider Markers
+  const swarmGroup = document.getElementById("enemySwarm");
+  for (let i = 0; i < 60; i++) {
+    const angle = Math.random() * Math.PI + Math.PI; // Top hemisphere
+    const radius = 180 + Math.random() * 200;
+    const dot = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+    dot.setAttribute("cx", 460 + Math.cos(angle) * radius);
+    dot.setAttribute("cy", 420 + Math.sin(angle) * (radius * 0.7));
+    dot.setAttribute("r", Math.random() * 5 + 3);
+    dot.setAttribute("fill", "#ef4444");
+    dot.setAttribute("class", "enemy-dot");
+    dot.setAttribute("opacity", "0");
+    swarmGroup.appendChild(dot);
+  }
+
+  // Generate 120 Disintegration Ash Particles
+  const ashGroup = document.getElementById("ashField");
+  for (let i = 0; i < 120; i++) {
+    const c = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+    c.setAttribute("cx", 360 + Math.random() * 200);
+    c.setAttribute("cy", 440 + Math.random() * 180);
+    c.setAttribute("r", Math.random() * 4 + 1.5);
+    c.setAttribute("fill", Math.random() > 0.4 ? "#f59e0b" : "#94a3b8");
+    c.setAttribute("class", "ash-p");
+    c.setAttribute("opacity", "0");
+    ashGroup.appendChild(c);
+  }
+
+  // High-Energy Kinetic Subtitle Function
+  function playSubtitle(words, highlightConfig = {}) {
+    const container = document.getElementById("subtitleBox");
+    container.innerHTML = "";
+    const wordElements = [];
+
+    words.forEach((w, idx) => {
+      const span = document.createElement("span");
+      span.className = "cap-word " + (highlightConfig[idx] || "");
+      span.textContent = w;
+      container.appendChild(span);
+      wordElements.push(span);
+    });
+
+    return gsap.to(wordElements, {
+      opacity: 1,
+      y: 0,
+      scale: 1,
+      filter: "blur(0px)",
+      stagger: 0.12,
+      duration: 0.28,
+      ease: "power3.out"
+    });
+  }
+
+  // Master GSAP Animation Timeline
+  const master = gsap.timeline({ repeat: -1 });
+
+  // SCENE 1: Shield Breach & Swarm Influx (0:00 - 0:07)
+  master.set("#scene1", { opacity: 1 })
+    .call(() => playSubtitle(["THE", "DOME", "JUST", "SHATTERED."], { 1: "highlight-crimson", 3: "highlight-crimson" }))
+    .fromTo(".enemy-dot", 
+      { opacity: 0, scale: 0 }, 
+      { opacity: 1, scale: 1.4, stagger: 0.015, duration: 1.2, ease: "power2.out" })
+    .to("#shieldMesh", {
+      scale: 1.08,
+      transformOrigin: "center",
+      stroke: "#ef4444",
+      repeat: 3,
+      yoyo: true,
+      duration: 0.2
+    })
+    .call(() => playSubtitle(["MILLIONS", "ARE", "CHARGING", "AT", "YOU."], { 0: "highlight-gold" }), null, "+=1.4")
+    .to("#scene1", { opacity: 0, duration: 0.4 }, "+=1.6")
+
+  // SCENE 2: Bifrost Strike (0:07 - 0:14)
+  master.set("#scene2", { opacity: 1 })
+    .set("#hudDot", { background: "#38bdf8", boxShadow: "0 0 18px #38bdf8" })
+    .set("#hudLabel", { textContent: "ANOMALY • RAINBOW BEAM" })
+    .call(() => playSubtitle(["YOU", "PREPARE", "FOR", "THE", "END..."]))
+    .to("#scene2", { duration: 1.2 })
+    .call(() => playSubtitle(["UNTIL", "A", "RAINBOW", "BEAM", "STRIKES!"], { 2: "highlight-cyan", 4: "highlight-neon" }))
+    .to("#beamCore", { opacity: 1, scaleY: 1, duration: 0.15, ease: "power4.out" })
+    .to("#impactRings1", { opacity: 1, scale: 1.3, transformOrigin: "center", duration: 0.3 }, "<")
+    .to("#impactFlash", { opacity: 0.85, duration: 0.1, yoyo: true, repeat: 1 })
+    .to("#scene2", { opacity: 0, duration: 0.4 }, "+=2.0")
+
+  // SCENE 3: Thor Lightning Blitz (0:14 - 0:21)
+  master.set("#scene3", { opacity: 1 })
+    .set("#hudDot", { background: "#22c55e", boxShadow: "0 0 18px #22c55e" })
+    .set("#hudLabel", { textContent: "ALLIES ARRIVED • THOR" })
+    .call(() => playSubtitle(["THOR", "LANDS.", "LIGHTNING", "ERASES", "THEM."], { 0: "highlight-gold", 2: "highlight-cyan" }))
+    .to("#impactFlash", { opacity: 0.9, duration: 0.08, repeat: 3, yoyo: true })
+    .to("#lightningCanvas", { opacity: 1, duration: 0.1, repeat: 6, yoyo: true }, "<")
+    .to("#viewport", { x: "+=18", y: "-=18", duration: 0.05, repeat: 8, yoyo: true }, "<")
+    .call(() => playSubtitle(["YOU", "ACTUALLY", "SURVIVED."], { 2: "highlight-neon" }), null, "+=1.8")
+    .to("#scene3", { opacity: 0, duration: 0.4 }, "+=1.6")
+
+  // SCENE 4: The Snap & Disintegration (0:21 - 0:28)
+  master.set("#scene4", { opacity: 1 })
+    .set("#hudDot", { background: "#fbbf24", boxShadow: "0 0 18px #fbbf24" })
+    .set("#hudLabel", { textContent: "CASUALTIES • THE SNAP" })
+    .call(() => playSubtitle(["THEN...", "A", "SUDDEN", "SNAP", "ECHOES."], { 3: "highlight-crimson" }))
+    .to("#snapShockwave", { opacity: 1, scale: 8, transformOrigin: "center", duration: 0.6, ease: "power2.out" })
+    .to("#impactFlash", { opacity: 0.5, duration: 0.15, yoyo: true, repeat: 1 }, "<")
+    .call(() => playSubtitle(["EVERYONE", "TURNS", "TO", "DUST."], { 3: "highlight-gold" }), null, "+=1.0")
+    .to(".ash-p", {
+      opacity: 1,
+      y: -280,
+      x: () => (Math.random() - 0.5) * 180,
+      stagger: 0.015,
+      duration: 2.6,
+      ease: "power2.out"
+    })
+    .to("#scene4", { opacity: 0, duration: 0.6 }, "+=1.4");
 </script>
 </body>
 </html>
