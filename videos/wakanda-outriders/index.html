@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>MCU POV: Wakanda 3D Battle Simulator - Sunset Lighting (Three.js WebGL)</title>
+  <title>MCU POV: Wakanda 3D Battle Simulator - Realistic Sunset Battlefield</title>
   <!-- Three.js 3D Engine & GSAP -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
@@ -29,7 +29,6 @@
       box-shadow: 0 0 140px rgba(0, 0, 0, 1);
     }
 
-    /* 3D WebGL Canvas Layer */
     #webglCanvas {
       position: absolute;
       inset: 0;
@@ -42,7 +41,7 @@
     .cinematic-vignette {
       position: absolute;
       inset: 0;
-      background: radial-gradient(circle at 50% 40%, transparent 40%, rgba(20, 6, 12, 0.85) 100%);
+      background: radial-gradient(circle at 50% 40%, transparent 35%, rgba(18, 5, 12, 0.9) 100%);
       pointer-events: none;
       z-index: 20;
     }
@@ -53,15 +52,15 @@
       top: 130px;
       left: 50%;
       transform: translateX(-50%);
-      background: rgba(28, 12, 22, 0.85);
-      border: 2px solid rgba(251, 146, 60, 0.35);
+      background: rgba(28, 12, 22, 0.88);
+      border: 2px solid rgba(251, 146, 60, 0.4);
       backdrop-filter: blur(20px);
-      padding: 16px 44px;
+      padding: 18px 48px;
       border-radius: 999px;
       display: flex;
       align-items: center;
       gap: 16px;
-      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8);
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.85);
       z-index: 30;
     }
     .hud-dot {
@@ -70,7 +69,7 @@
       border-radius: 50%;
       background: #f97316;
       box-shadow: 0 0 16px #f97316;
-      animation: pulse 1s infinite alternate;
+      animation: pulse 1.4s infinite alternate;
     }
     .pov-badge span {
       font-size: 26px;
@@ -94,20 +93,20 @@
       align-items: center;
     }
     .caption-pill {
-      background: rgba(18, 8, 16, 0.92);
-      border: 2px solid rgba(251, 146, 60, 0.3);
+      background: rgba(16, 7, 14, 0.94);
+      border: 2px solid rgba(251, 146, 60, 0.35);
       backdrop-filter: blur(28px);
-      padding: 30px 48px;
-      border-radius: 38px;
+      padding: 32px 52px;
+      border-radius: 40px;
       box-shadow: 0 25px 80px rgba(0,0,0,0.95);
       display: inline-block;
     }
     .cap-word {
       display: inline-block;
-      font-size: 60px;
+      font-size: 58px;
       font-weight: 900;
       text-transform: uppercase;
-      line-height: 1.15;
+      line-height: 1.18;
       letter-spacing: -1.5px;
       color: #ffffff;
       margin: 0 10px;
@@ -134,7 +133,7 @@
     #flash {
       position: absolute;
       inset: 0;
-      background: #fff;
+      background: #ffffff;
       opacity: 0;
       pointer-events: none;
       z-index: 50;
@@ -154,7 +153,7 @@
   <!-- HUD Badge -->
   <div class="pov-badge">
     <div class="hud-dot" id="hudDot"></div>
-    <span id="hudLabel">3D POV • WAKANDA SUNSET</span>
+    <span id="hudLabel">3D POV • WAKANDA BATTLEFIELD</span>
   </div>
 
   <!-- TikTok Subtitles -->
@@ -168,71 +167,105 @@
 
 <script>
   // -------------------------------------------------------------
-  // 1. THREE.JS 3D WORLD SETUP (SUNSET LIGHTING & GOLDEN HOUR)
+  // 1. THREE.JS 3D SCENE SETUP & BATTLEFIELD IMPROVEMENTS
   // -------------------------------------------------------------
   const stage = document.getElementById('stage');
   const scene = new THREE.Scene();
   
-  // Warm Golden-Hour Sunset Fog & Background
-  scene.background = new THREE.Color(0x280e1b);
-  scene.fog = new THREE.FogExp2(0x2d101e, 0.0038);
+  scene.background = new THREE.Color(0x220c18);
+  scene.fog = new THREE.FogExp2(0x280e1c, 0.0028);
 
-  const camera = new THREE.PerspectiveCamera(65, 1080 / 1920, 0.1, 1000);
+  const camera = new THREE.PerspectiveCamera(65, 1080 / 1920, 0.1, 1200);
   const renderer = new THREE.WebGLRenderer({ antialias: true });
   renderer.setSize(1080, 1920);
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
-  renderer.toneMappingExposure = 1.35;
+  renderer.toneMappingExposure = 1.3;
   document.getElementById('webglCanvas').appendChild(renderer.domElement);
 
-  // Sunset Warm Ambient Lighting
-  const ambientLight = new THREE.AmbientLight(0x4a2430, 1.4);
+  // Lighting
+  const ambientLight = new THREE.AmbientLight(0x4a2432, 1.4);
   scene.add(ambientLight);
 
-  // Low Golden Sun Horizon Light
-  const sunLight = new THREE.DirectionalLight(0xff7a33, 3.2);
-  sunLight.position.set(-80, 35, -200);
+  const sunLight = new THREE.DirectionalLight(0xff7a33, 3.4);
+  sunLight.position.set(-100, 45, -220);
   scene.add(sunLight);
 
-  // Purple/Magenta Fill Light for Shadows
-  const skyFillLight = new THREE.DirectionalLight(0x8a2be2, 1.2);
-  skyFillLight.position.set(60, 100, 50);
-  scene.add(skyFillLight);
+  const fillLight = new THREE.DirectionalLight(0x7c3aed, 1.1);
+  fillLight.position.set(80, 100, 60);
+  scene.add(fillLight);
 
-  const flashLight = new THREE.PointLight(0x00f2fe, 0, 400);
+  const flashLight = new THREE.PointLight(0x38bdf8, 0, 500);
   flashLight.position.set(0, 40, -100);
   scene.add(flashLight);
 
-  // 3D Battlefield Terrain (Wakanda Field in Sunset Tone)
-  const terrainGeo = new THREE.PlaneGeometry(800, 800, 48, 48);
+  // --- Rolling Wakanda Mountain Ridges & Battlefield Hills ---
+  const terrainGeo = new THREE.PlaneGeometry(900, 900, 64, 64);
   terrainGeo.rotateX(-Math.PI / 2);
+  const pos = terrainGeo.attributes.position;
+  for (let i = 0; i < pos.count; i++) {
+    const x = pos.getX(i);
+    const z = pos.getZ(i);
+    // Natural rolling terrain and background mountains
+    let y = Math.sin(x * 0.015) * Math.cos(z * 0.015) * 12;
+    if (Math.abs(x) > 160 || z < -180) {
+      y += Math.sin(x * 0.03) * 35 + Math.cos(z * 0.03) * 45; // Mountain ranges
+    }
+    pos.setY(i, y);
+  }
+  terrainGeo.computeVertexNormals();
+
   const terrainMat = new THREE.MeshStandardMaterial({
-    color: 0x3d231a,
-    roughness: 0.8,
-    metalness: 0.2,
+    color: 0x3d241c,
+    roughness: 0.85,
+    metalness: 0.15,
     flatShading: true
   });
   const terrain = new THREE.Mesh(terrainGeo, terrainMat);
   scene.add(terrain);
 
-  // 3D Wakandan Energy Dome Barrier (Warm Orange/Magenta Glow)
-  const domeGeo = new THREE.SphereGeometry(180, 32, 24, 0, Math.PI * 2, 0, Math.PI / 2);
+  // --- Wakandan Warrior Defense Line (Spears with Glowing Tips) ---
+  const troopCount = 45;
+  const spearGeo = new THREE.CylinderGeometry(0.12, 0.12, 8, 8);
+  const spearMat = new THREE.MeshStandardMaterial({ color: 0x94a3b8, metalness: 0.8, roughness: 0.2 });
+  const tipGeo = new THREE.ConeGeometry(0.3, 1.4, 8);
+  const tipMat = new THREE.MeshBasicMaterial({ color: 0x38bdf8 });
+
+  const spearGroup = new THREE.Group();
+  for (let i = 0; i < troopCount; i++) {
+    const s = new THREE.Mesh(spearGeo, spearMat);
+    const t = new THREE.Mesh(tipGeo, tipMat);
+    t.position.y = 4.2;
+    s.add(t);
+
+    const x = (i % 15 - 7) * 9 + (Math.random() - 0.5) * 3;
+    const row = Math.floor(i / 15);
+    const z = -20 - row * 12 + (Math.random() - 0.5) * 4;
+    s.position.set(x, 4, z);
+    s.rotation.x = -0.2 - Math.random() * 0.15;
+    s.rotation.z = (Math.random() - 0.5) * 0.1;
+    spearGroup.add(s);
+  }
+  scene.add(spearGroup);
+
+  // --- Wakandan Dome Shield with Amber Wireframe ---
+  const domeGeo = new THREE.SphereGeometry(220, 36, 28, 0, Math.PI * 2, 0, Math.PI / 2);
   const domeMat = new THREE.MeshBasicMaterial({
     color: 0xfb923c,
     wireframe: true,
     transparent: true,
-    opacity: 0.28
+    opacity: 0.32
   });
   const dome = new THREE.Mesh(domeGeo, domeMat);
-  dome.position.set(0, 0, -120);
+  dome.position.set(0, 0, -140);
   scene.add(dome);
 
-  // 3D Charging Outrider Horde
+  // --- Outrider Swarm Horde ---
   const outriderCount = 180;
-  const outriderGeo = new THREE.ConeGeometry(1.6, 5, 5);
+  const outriderGeo = new THREE.ConeGeometry(1.8, 5.5, 5);
   outriderGeo.rotateX(Math.PI / 2);
   const outriderMat = new THREE.MeshStandardMaterial({
-    color: 0x1f0a12,
+    color: 0x18060f,
     emissive: 0xe11d48,
     emissiveIntensity: 0.45,
     roughness: 0.4
@@ -242,18 +275,18 @@
 
   const outriderData = [];
   for (let i = 0; i < outriderCount; i++) {
-    const x = (Math.random() - 0.5) * 160;
-    const z = -140 - Math.random() * 200;
-    const speed = 0.45 + Math.random() * 0.4;
+    const x = (Math.random() - 0.5) * 220;
+    const z = -160 - Math.random() * 240;
+    const speed = 0.22 + Math.random() * 0.2; // Slower, heavier charge speed
     outriderData.push({ x, z, speed, dead: false });
-    dummy.position.set(x, 2.5, z);
+    dummy.position.set(x, 3.0, z);
     dummy.updateMatrix();
     horde.setMatrixAt(i, dummy.matrix);
   }
   scene.add(horde);
 
-  // 3D Bifrost Beam (Glowing Sunset Rainbow Cylinder)
-  const beamGeo = new THREE.CylinderGeometry(8, 8, 300, 24, 1, true);
+  // --- Bifrost Beam ---
+  const beamGeo = new THREE.CylinderGeometry(10, 10, 380, 24, 1, true);
   const beamMat = new THREE.MeshBasicMaterial({
     color: 0x38bdf8,
     transparent: true,
@@ -261,22 +294,22 @@
     side: THREE.DoubleSide
   });
   const bifrostBeam = new THREE.Mesh(beamGeo, beamMat);
-  bifrostBeam.position.set(0, 150, -60);
+  bifrostBeam.position.set(0, 190, -80);
   scene.add(bifrostBeam);
 
-  // 3D Disintegration Ash Particle Cloud (Golden Sunset Embers)
-  const ashCount = 800;
+  // --- Disintegration Ash Cloud ---
+  const ashCount = 900;
   const ashGeo = new THREE.BufferGeometry();
   const ashPositions = new Float32Array(ashCount * 3);
   for (let i = 0; i < ashCount * 3; i += 3) {
-    ashPositions[i] = (Math.random() - 0.5) * 120;
-    ashPositions[i + 1] = Math.random() * 60;
-    ashPositions[i + 2] = -20 - Math.random() * 120;
+    ashPositions[i] = (Math.random() - 0.5) * 160;
+    ashPositions[i + 1] = Math.random() * 80;
+    ashPositions[i + 2] = -20 - Math.random() * 160;
   }
   ashGeo.setAttribute('position', new THREE.BufferAttribute(ashPositions, 3));
   const ashMat = new THREE.PointsMaterial({
     color: 0xfbbf24,
-    size: 2.0,
+    size: 2.2,
     transparent: true,
     opacity: 0
   });
@@ -284,7 +317,7 @@
   scene.add(ashCloud);
 
   // -------------------------------------------------------------
-  // 2. KINETIC SUBTITLE ENGINE
+  // 2. KINETIC SUBTITLE ENGINE (PACE-MATCHED)
   // -------------------------------------------------------------
   function showSubtitle(words, highlights = {}) {
     const box = document.getElementById("captionTarget");
@@ -303,102 +336,109 @@
       opacity: 1,
       scale: 1,
       y: 0,
-      stagger: 0.11,
-      duration: 0.24,
-      ease: "back.out(2.2)"
+      stagger: 0.16,
+      duration: 0.32,
+      ease: "back.out(1.8)"
     });
   }
 
   // -------------------------------------------------------------
-  // 3. CINEMATIC 3D CAMERA TIMELINE (First-Person & Cinematic Wide)
+  // 3. SLOWER, MORE CINEMATIC CAMERA PACING (38s TOTAL LOOP)
   // -------------------------------------------------------------
   const master = gsap.timeline({ repeat: -1 });
 
-  // SCENE 1: First-Person Frontline Breach (0:00 - 0:07)
+  // SCENE 1: First-Person Frontline Stand (0:00 - 0:10) - 10s
   master.call(() => {
-    camera.position.set(0, 4.5, 0);
-    camera.lookAt(0, 4.5, -100);
+    camera.position.set(0, 4.2, 5);
+    camera.lookAt(0, 4.2, -100);
     domeMat.opacity = 0.35;
     domeMat.color.setHex(0xe11d48);
     document.getElementById("hudDot").style.background = "#e11d48";
     document.getElementById("hudLabel").textContent = "1ST PERSON POV • DOME BREACH";
   })
   .call(() => showSubtitle(["THE", "DOME", "JUST", "SHATTERED."], { 1: "highlight-red", 3: "highlight-red" }))
-  .to(camera.position, { z: -15, duration: 3, ease: "power1.inOut" })
-  .call(() => showSubtitle(["MILLIONS", "ARE", "CHARGING", "AT", "YOU."], { 0: "highlight-gold" }), null, "+=1.2")
-  .to("#stage", { x: "+=12", y: "-=12", duration: 0.05, repeat: 12, yoyo: true }, "+=0.2")
+  .to(camera.position, { z: -10, duration: 4.5, ease: "power1.inOut" })
+  .call(() => showSubtitle(["MILLIONS", "ARE", "RUSHING", "STRAIGHT", "AT", "YOU."], { 0: "highlight-gold" }), null, "+=2.0")
+  .to("#stage", { x: "+=10", y: "-=10", duration: 0.06, repeat: 16, yoyo: true }, "+=0.4")
+  .to(camera.position, { z: -25, duration: 3.5, ease: "power1.out" })
 
-  // SCENE 2: Cinematic Drone Shot (Far Away) + Bifrost Strike (0:07 - 0:14)
+  // SCENE 2: Cinematic Drone Far-Away Shot + Bifrost Beam (0:10 - 0:20) - 10s
   .call(() => {
-    gsap.to(camera.position, { x: 45, y: 70, z: 60, duration: 1.5, ease: "power2.out" });
+    gsap.to(camera.position, { x: 60, y: 85, z: 90, duration: 3.0, ease: "power2.out" });
     document.getElementById("hudDot").style.background = "#38bdf8";
-    document.getElementById("hudLabel").textContent = "WIDE PERSPECTIVE • BIFROST TEAR";
+    document.getElementById("hudLabel").textContent = "AERIAL VIEW • BIFROST TEAR";
   })
   .call(() => showSubtitle(["YOU", "PREPARE", "FOR", "THE", "END..."]))
-  .to(bifrostBeam.material, { opacity: 0.9, duration: 0.2, ease: "power4.out" }, "+=1.2")
-  .to(flashLight, { intensity: 8, duration: 0.1, yoyo: true, repeat: 1 }, "<")
-  .to("#flash", { opacity: 0.85, duration: 0.08, yoyo: true, repeat: 1 }, "<")
-  .call(() => showSubtitle(["UNTIL", "A", "RAINBOW", "BEAM", "STRIKES!"], { 2: "highlight-cyan", 4: "highlight-neon" }))
-  .to(bifrostBeam.material, { opacity: 0, duration: 0.6 }, "+=1.8")
+  .to(bifrostBeam.material, { opacity: 0.95, duration: 0.35, ease: "power4.out" }, "+=2.5")
+  .to(flashLight, { intensity: 10, duration: 0.15, yoyo: true, repeat: 1 }, "<")
+  .to("#flash", { opacity: 0.85, duration: 0.12, yoyo: true, repeat: 1 }, "<")
+  .call(() => showSubtitle(["UNTIL", "A", "RAINBOW", "BEAM", "TEARS", "THE", "SKY!"], { 2: "highlight-cyan", 6: "highlight-neon" }))
+  .to(bifrostBeam.material, { opacity: 0, duration: 1.2 }, "+=2.8")
 
-  // SCENE 3: First-Person Thor Lightning Blitz (0:14 - 0:21)
+  // SCENE 3: First-Person Thor Lightning Arrival (0:20 - 0:30) - 10s
   .call(() => {
-    camera.position.set(0, 4.5, -40);
-    camera.lookAt(0, 4.5, -120);
+    camera.position.set(0, 4.2, -45);
+    camera.lookAt(0, 4.2, -120);
     document.getElementById("hudDot").style.background = "#22c55e";
     document.getElementById("hudLabel").textContent = "1ST PERSON POV • THOR ARRIVAL";
   })
-  .call(() => showSubtitle(["THOR", "LANDS.", "LIGHTNING", "ERASES", "THEM."], { 0: "highlight-gold", 2: "highlight-cyan" }))
-  .to(flashLight, { intensity: 12, color: 0x38bdf8, duration: 0.08, repeat: 5, yoyo: true })
-  .to("#flash", { opacity: 0.9, duration: 0.06, repeat: 3, yoyo: true }, "<")
-  .to("#stage", { x: "+=18", y: "-=18", duration: 0.04, repeat: 10, yoyo: true }, "<")
+  .call(() => showSubtitle(["THOR", "LANDS.", "LIGHTNING", "OBLITERATES", "THEM."], { 0: "highlight-gold", 2: "highlight-cyan" }))
+  .to(flashLight, { intensity: 14, color: 0x38bdf8, duration: 0.1, repeat: 7, yoyo: true })
+  .to("#flash", { opacity: 0.9, duration: 0.08, repeat: 4, yoyo: true }, "<")
+  .to("#stage", { x: "+=16", y: "-=16", duration: 0.04, repeat: 14, yoyo: true }, "<")
   .call(() => {
     outriderData.forEach(d => d.dead = true);
   })
-  .call(() => showSubtitle(["YOU", "ACTUALLY", "SURVIVED."], { 2: "highlight-neon" }), null, "+=1.8")
+  .call(() => showSubtitle(["YOU", "ACTUALLY", "SURVIVED."], { 2: "highlight-neon" }), null, "+=2.8")
+  .to(camera.position, { z: -55, duration: 3.0, ease: "power1.out" })
 
-  // SCENE 4: Wide Pan & Snap Disintegration Dust (0:21 - 0:28)
+  // SCENE 4: Panoramic Orbit & The Snap Disintegration (0:30 - 0:38) - 8s
   .call(() => {
-    gsap.to(camera.position, { x: -30, y: 35, z: 20, duration: 3.5, ease: "power2.out" });
+    gsap.to(camera.position, { x: -45, y: 40, z: 30, duration: 5.0, ease: "power1.inOut" });
     document.getElementById("hudDot").style.background = "#f59e0b";
-    document.getElementById("hudLabel").textContent = "CINEMATIC WIDE • THE SNAP";
+    document.getElementById("hudLabel").textContent = "CINEMATIC PAN • THE SNAP";
   })
   .call(() => showSubtitle(["THEN...", "A", "SUDDEN", "SNAP", "ECHOES."], { 3: "highlight-red" }))
-  .to("#flash", { opacity: 0.5, duration: 0.12, yoyo: true, repeat: 1 }, "+=0.6")
-  .to(ashMat, { opacity: 0.95, duration: 1.5 }, "<")
-  .call(() => showSubtitle(["EVERYONE", "TURNS", "TO", "DUST."], { 3: "highlight-gold" }), null, "+=0.8")
-  .to(ashMat, { opacity: 0, duration: 1.2 }, "+=2.0")
+  .to("#flash", { opacity: 0.55, duration: 0.18, yoyo: true, repeat: 1 }, "+=1.0")
+  .to(ashMat, { opacity: 0.95, duration: 2.2 }, "<")
+  .call(() => showSubtitle(["EVERYONE", "TURNS", "TO", "DUST."], { 3: "highlight-gold" }), null, "+=1.2")
+  .to(ashMat, { opacity: 0, duration: 1.8 }, "+=2.8")
   .call(() => {
-    outriderData.forEach(d => { d.dead = false; d.z = -140 - Math.random() * 200; });
+    outriderData.forEach(d => { d.dead = false; d.z = -160 - Math.random() * 240; });
   });
 
   // -------------------------------------------------------------
-  // 4. CONTINUOUS RENDER LOOP (60 FPS)
+  // 4. ANIMATION LOOP
   // -------------------------------------------------------------
   function animate() {
     requestAnimationFrame(animate);
 
-    // Animate Charging Outriders
+    // Spear Frontline Subtle Breathing Animation
+    spearGroup.children.forEach((s, idx) => {
+      s.rotation.x = -0.2 + Math.sin(Date.now() * 0.002 + idx) * 0.04;
+    });
+
+    // Outrider Horde Motion
     for (let i = 0; i < outriderCount; i++) {
       const data = outriderData[i];
       if (!data.dead) {
         data.z += data.speed;
-        if (data.z > 20) data.z = -240;
+        if (data.z > 30) data.z = -260;
       } else {
-        data.z -= 0.2;
+        data.z -= 0.12;
       }
-      dummy.position.set(data.x, 2.5, data.z);
-      dummy.rotation.x = Math.sin(Date.now() * 0.01 + i) * 0.2;
+      dummy.position.set(data.x, 3.0, data.z);
+      dummy.rotation.x = Math.sin(Date.now() * 0.006 + i) * 0.15;
       dummy.updateMatrix();
       horde.setMatrixAt(i, dummy.matrix);
     }
     horde.instanceMatrix.needsUpdate = true;
 
-    // Animate Ash Disintegration Particles Rising
+    // Rising Golden Sunset Ash Particles
     const positions = ashGeo.attributes.position.array;
     for (let i = 1; i < ashCount * 3; i += 3) {
-      positions[i] += 0.35;
-      if (positions[i] > 80) positions[i] = 0;
+      positions[i] += 0.22; // Slower floating embers
+      if (positions[i] > 90) positions[i] = 0;
     }
     ashGeo.attributes.position.needsUpdate = true;
 
